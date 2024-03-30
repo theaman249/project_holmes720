@@ -21,10 +21,10 @@
 <body>
     <div class="content-center" style="display: flex; justify-content: center; margin-top: 48px;">
         <form>
-            <h1 class="text-main-header-style" style="text-align: center;">Registration</h1>
+            <h1 class="text-main-header-style" style="text-align: center; margin-bottom: 32px;">Registration</h1>
 
             <div class="mb-3">
-                <input type="text" placeholder="Student Number" style="width: 500px;" class="form-control" id="id_passwordInput">
+                <input type="text" placeholder="Student Number" style="width: 500px;" class="form-control" id="id_studentNumberInput">
                 
                 <div id="id_stdOut" style="color: red;" class="form-text"></div>
             </div>
@@ -32,41 +32,41 @@
             <div class="mb-3">
                 <input type="text" placeholder="Name" style="width: 500px;" class="form-control" id="id_nameInput">
                 
-                <div id="id_nameOut" class="form-text"></div>
+                <div id="id_nameOut" style="color: red;" class="form-text"></div>
             </div>
 
             <div class="mb-3">
                 <input type="text" placeholder="surname" style="width: 500px;" class="form-control" id="id_surnameInput">
                 
-                <div id="id_surnameOut" class="form-text"></div>
+                <div id="id_surnameOut" style="color: red;" class="form-text"></div>
             </div>
 
             <div class="mb-3">
               <input type="email" placeholder="email" style="width: 500px;" class="form-control" id="id_emailInput">
 
-              <div id="id_emailOut" class="form-text"></div>
+              <div id="id_emailOut" style="color: red;" class="form-text"></div>
             </div>
 
             <div class="mb-3">
               <input type="password" placeholder="password" style="width: 500px;" class="form-control" id="id_passwordInput">
               
-              <div id="id_passwordOut" class="form-text"></div>
+              <div id="id_passwordOut" style="color: red;" class="form-text"></div>
             </div>
 
             <div class="mb-3">
-                <input type="password" placeholder="password confirmation" style="width: 500px;" class="form-control" id="id_passwordCornfirmationInput">
+                <input type="password" placeholder="password confirmation" style="width: 500px;" class="form-control" id="id_passwordConfirmationInput">
                 
-                <div id="id_passwordConfirmationOut" class="form-text"></div>
+                <div id="id_passwordConfirmationOut" style="color: red;" class="form-text"></div>
             </div>
 
             <div class="mb-3">
                 <input type="number" placeholder="Year of Study" style="width: 150px;" class="form-control" id="id_yearOfStudyInput" min="1" max ="3">
                 
-                <div id="id_yearOfStudyOut" class="form-text"></div>
+                <div id="id_yearOfStudyOut" style="color: red;" class="form-text"></div>
             </div>
 
 
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button id ="id_btnRegister" type="register" class="btn btn-primary">Submit</button>
         </form>
     </div>
 </body>
