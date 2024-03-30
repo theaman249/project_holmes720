@@ -1,7 +1,10 @@
 const studentNumber = document.getElementById("id_studentNumberInput");
 const email = document.getElementById("id_emailInput");
 const password = document.getElementById("id_passwordInput");
+const fname = document.getElementById("id_nameInput");
+const lname = document.getElementById("id_surnameInput");
 const passwordConfirm = document.getElementById("id_passwordConfirmationInput");
+const YOS = document.getElementById("id_yearOfStudyInput");
 
 const studentNumberRegex = /^[up]\d{8}$/;
 const emailRegex =/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -17,7 +20,7 @@ var validEmail = false;
 var validPassword = false;
 var validConfirmPassword = false;
 
-const URL = "http://localhost:3333/api/registerAdmin";
+const url = "http://localhost:3000/register";
 
 studentNumber.addEventListener("input", function(event){
     const stdOut = document.getElementById("id_stdOut");
@@ -124,10 +127,19 @@ btnRegister.addEventListener("click", function(event){
     else{
         successOut.innerHTML = "submitting user details....";
 
+        const jsonObj={
+            id: studentNumber.value,
+            fname: fname.value,
+            lname: lname.value,
+            email: email.value,
+            password: password.value,
+            year_of_study: YOS.value,
+        }
+
         const jsonString = JSON.stringify(jsonObj);
 
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", URL);
+        xhr.open("POST", url);
         xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
                 
