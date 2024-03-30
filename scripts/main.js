@@ -17,6 +17,8 @@ var validEmail = false;
 var validPassword = false;
 var validConfirmPassword = false;
 
+const URL = "http://localhost:3333/api/registerAdmin";
+
 studentNumber.addEventListener("input", function(event){
     const stdOut = document.getElementById("id_stdOut");
 
@@ -111,15 +113,42 @@ function isValidYear(){
     }
 }
 
+
 btnRegister.addEventListener("click", function(event){
+
+    const successOut = document.getElementById("id_successOut");
     
     if(!validStdNumer || !validEmail || !validConfirmPassword || !validPassword || isValidNameAndSurname() || isValidYear()){
         alert('Unable to submit. Some Information was wrong');
     }
     else{
-        alert('User Details submitted');
+        successOut.innerHTML = "submitting user details....";
+
+        const jsonString = JSON.stringify(jsonObj);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", URL);
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+                
+        //this will subscribe to the onreadystatechange
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                console.log(xhr.status);
+                console.log(xhr.responseText);
+
+                if (xhr.status === 201) {
+                    successOut.innerHTML = "Done!";
+                }   
+            }
+        };
+
+        xhr.send(jsonString);
     }
 });
+
+
+
 
 
 
