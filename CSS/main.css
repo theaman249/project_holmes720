@@ -1,0 +1,17 @@
+.content-center{
+    display:block;
+    width:50%;
+    margin:0 auto;
+}
+
+.text-main-header-style{
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.text-body-style-1{
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
