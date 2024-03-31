@@ -56,7 +56,7 @@ const client = new Client({
     try {
       await clientNew.query(`
         CREATE TABLE IF NOT EXISTS students (
-          id VARCHAR(8) PRIMARY KEY,
+          id VARCHAR(9) PRIMARY KEY,
           fname VARCHAR(100),
           lname VARCHAR(100),
           email VARCHAR(60),
@@ -86,7 +86,7 @@ const client = new Client({
     // Verification query (optional)
     const results = await clientNew.query('SELECT * FROM students');
 
-    if (results.rowCount > 0) {
+    if (results) {
       console.log('Database and tables verified successfully.');
     } else {
       console.log('Database and tables verification unsuccessful.');

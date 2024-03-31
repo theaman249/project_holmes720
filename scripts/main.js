@@ -20,8 +20,6 @@ var validEmail = false;
 var validPassword = false;
 var validConfirmPassword = false;
 
-const url = "http://localhost:3000/register";
-
 studentNumber.addEventListener("input", function(event){
     const stdOut = document.getElementById("id_stdOut");
 
@@ -117,8 +115,7 @@ function isValidYear(){
 }
 
 
-btnRegister.addEventListener("click", function(event){
-
+function submitForm(){
     const successOut = document.getElementById("id_successOut");
     
     if(!validStdNumer || !validEmail || !validConfirmPassword || !validPassword || isValidNameAndSurname() || isValidYear()){
@@ -139,7 +136,7 @@ btnRegister.addEventListener("click", function(event){
         const jsonString = JSON.stringify(jsonObj);
 
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", url);
+        xhr.open("POST", "http://localhost:3000/register");
         xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
                 
@@ -149,14 +146,19 @@ btnRegister.addEventListener("click", function(event){
                 console.log(xhr.status);
                 console.log(xhr.responseText);
 
-                if (xhr.status === 201) {
-                    successOut.innerHTML = "Done!";
+                if (xhr.status === 200) {
+                    alert('Registration Complete');
                 }   
             }
         };
 
         xhr.send(jsonString);
     }
+}
+
+document.getElementById("registrationForm").addEventListener("submit", function(event) {
+    // Prevent the default form submission behavior
+    event.preventDefault();
 });
 
 
