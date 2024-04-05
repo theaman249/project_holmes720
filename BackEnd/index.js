@@ -64,15 +64,57 @@ app.post('/register', (req, res) =>{
                 if (err) {
                     console.error('Error executing query:', err);
                 } else {
-                    console.log('Query executed successfully.');
+                    console.log('Register executed successfully.');
                     console.log('Inserted rows:', result.rowCount);
+
+                    res.send({
+                        message: "registration successful",
+                    })
                 }
             });     
         }
     });
 
-    res.send({
-        message: "registration successful",
-    })
+    
 
+});
+
+app.post('/login', (req, res) =>{
+
+    const {id, password} = req.body;
+
+    console.log(req.body);
+
+    bcrypt.hash(password, saltRounds, function(err, hash) //hash the passowrd
+    {
+        if(err){
+            console.log('There was an error with bcrypt', err);
+        } else{
+            bcrypt.compare(password, hash, function(err, result)
+            {
+                if(err){
+                    console.log('There was an error with bcrypt', err);
+                }
+                else {
+        
+                    const query = "SELECT * FROM students WHERE id = '"+id+"'";
+        
+                    client.query(query, (err,result) =>{
+                        if(err){
+                            console.error('Error executing query:', err);
+                        }
+                        else{
+                            console.log('Login executed successfully.');
+                            //console.log(result.rows[0].id);
+
+                            res.send({
+                                message: "login successful",
+                            })
+                        }
+                    });
+        
+                }
+            });  
+        }
+    });
 });
