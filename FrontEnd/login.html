@@ -3,9 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' http://localhost:3000 https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js; style-src 'self' https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css https://fonts.googleapis.com/css2 'unsafe-inline'">
+    <link href="../CSS/main.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz@0,6..12;1,6..12&display=swap" rel="stylesheet">
+    <!--self:means allow anything to execute in the current within the same origin as the current document
+        default-src: This directive specifies the default policy for loading content such as JavaScript, images, CSS, fonts, AJAX requests
+        script-src: defines valid sources for javascript files
+        unsafe-inline: allows for you inline scripts and inline css to execute. Also on-click won't work if this isn't enabled.
+        THE CSP WORKS!!! It also works with my bootstrap content.
+        CSP also specifies the endPoints or URL that your domain is allowed to point to.
+    -->
     <title>Login</title>
 </head>
 <body>
-    
+    <div class="content-center" style="display: flex; justify-content: center; margin-top: 48px;">
+        <form id="loginForm">
+            <h1 class="text-main-header-style" style="text-align: center; margin-bottom: 32px;">Registration</h1>
+
+            <div class="mb-3">
+                <input type="text" placeholder="Student Number" style="width: 500px;" class="form-control" id="id_logStudentNumberInput">
+                
+                <div id="id_logStdOut" style="color: red;" class="form-text"></div>
+            </div>
+
+            <div class="mb-3">
+              <input type="password" placeholder="password" style="width: 500px;" class="form-control" id="id_logPasswordInput">
+              
+              <div id="id_logPasswordOut" style="color: red;" class="form-text"></div>
+            </div>
+
+            <button id ="id_btnLogin" class="btn btn-primary" onclick="login()">Login</button>
+            <div id="id_logSuccessOut" class="form-text"></div><div id="id_successOut" class="form-text"></div>
+        </form>
+    </div>
 </body>
+<script src="../scripts/login.js"></script>
 </html>

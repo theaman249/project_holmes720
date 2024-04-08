@@ -82,39 +82,41 @@ app.post('/register', (req, res) =>{
 app.post('/login', (req, res) =>{
 
     const {id, password} = req.body;
+    var hash = "";
 
     console.log(req.body);
 
-    bcrypt.hash(password, saltRounds, function(err, hash) //hash the passowrd
-    {
-        if(err){
-            console.log('There was an error with bcrypt', err);
-        } else{
-            bcrypt.compare(password, hash, function(err, result)
-            {
-                if(err){
-                    console.log('There was an error with bcrypt', err);
-                }
-                else {
-        
-                    const query = "SELECT * FROM students WHERE id = '"+id+"'";
-        
-                    client.query(query, (err,result) =>{
-                        if(err){
-                            console.error('Error executing query:', err);
-                        }
-                        else{
-                            console.log('Login executed successfully.');
-                            //console.log(result.rows[0].id);
 
-                            res.send({
-                                message: "login successful",
-                            })
-                        }
-                    });
-        
+    const getHash = "SELECT password FROM students WHERE id ='"+id+"'";
+    
+    client.query(getHash, (err,result) =>{
+        if(err){
+            console.error('Error executing query:', err);
+        } else{
+            console.log(result.rows[0].password);
+            hash = result.rows[0].password;
+
+            bcrypt.compare(password, hash, function(err, result) {
+                if (err) {
+                    console.log('There was an error with bcrypt', err);
+                } else {
+                    if (result) {
+                       res.status(200).send({
+                        message: "login successful",
+                       });
+                    } 
+                    else {
+                        res.status(401).send({
+                            message: "login unsuccessful",
+                        });
+                    }
                 }
-            });  
+            });
         }
     });
+
+    
+
+    
+    
 });

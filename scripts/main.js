@@ -20,6 +20,7 @@ var validEmail = false;
 var validPassword = false;
 var validConfirmPassword = false;
 
+
 studentNumber.addEventListener("input", function(event){
     const stdOut = document.getElementById("id_stdOut");
 
@@ -147,8 +148,12 @@ function submitForm(){
                 console.log(xhr.responseText);
 
                 if (xhr.status === 200) {
-                    alert('Registration Complete');
-                }   
+                    alert('Registration Complete!');
+                    successOut.innerHTML = "";
+                }    
+                else{
+                    alert('Oops...Something went wrong');
+                }
             }
         };
 
@@ -156,10 +161,15 @@ function submitForm(){
     }
 }
 
+
 document.getElementById("registrationForm").addEventListener("submit", function(event) {
     // Prevent the default form submission behavior
     event.preventDefault();
+
+    this.reset();
 });
+
+
 
 
 
