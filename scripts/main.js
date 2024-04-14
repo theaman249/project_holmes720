@@ -118,12 +118,18 @@ function isValidYear(){
 
 function submitForm(){
     const successOut = document.getElementById("id_successOut");
+    var role = "unknown";
     
     if(!validStdNumer || !validEmail || !validConfirmPassword || !validPassword || isValidNameAndSurname() || isValidYear()){
         alert('Unable to submit. Some Information was wrong');
     }
     else{
         successOut.innerHTML = "submitting user details....";
+
+        if(studentNumber.value[0] === "u")
+            role = "student";
+        else
+            role = "admin";
 
         const jsonObj={
             id: studentNumber.value,
@@ -132,7 +138,10 @@ function submitForm(){
             email: email.value,
             password: password.value,
             year_of_study: YOS.value,
+            role: role,
         }
+
+        console.log(jsonObj);
 
         const jsonString = JSON.stringify(jsonObj);
 
@@ -148,7 +157,8 @@ function submitForm(){
                 console.log(xhr.responseText);
 
                 if (xhr.status === 200) {
-                    alert('Registration Complete!');
+                    alert(xhr.responseText);
+                    console.log(xhr);
                     successOut.innerHTML = "";
                 }    
                 else{

@@ -47,33 +47,50 @@ app.get('/testConnection', async (req, res) => {
 
 app.post('/register', (req, res) =>{
 
-    const {id, fname, lname, email, password, year_of_study} = req.body;
+    const {id, fname, lname, email, password, year_of_study, role} = req.body;
 
     console.log(req.body);
 
-    //this is an asynchronous implementation and the salt will be auto generated.
-    bcrypt.hash(password, saltRounds, function(err, hash) {
+    const alreadyExist = "SELECT id FROM students WHERE id ='"+id+"'";
+
+    client.query(alreadyExist, (err,result)=>{
         if(err){
-            console.log('There was an error with bcrypt', err);
+            console.log('There was an error with an existing user', err)
         } else{
-            // Store hash in your password DB.
-            const query = "INSERT INTO students (id, fname, lname, email, password,year_of_study) VALUES ('" +
-            id + "', '" + fname + "', '" + lname + "', '" + email + "', '" + hash + "', '"+parseInt(year_of_study)+"')";
 
-            client.query(query,(err, result)=>{
-                if (err) {
-                    console.error('Error executing query:', err);
-                } else {
-                    console.log('Register executed successfully.');
-                    console.log('Inserted rows:', result.rowCount);
+            if(result.rows.length > 0){
+                res.send({
+                    message: "user already exists",
+                })
+            }
+            else{
+                bcrypt.hash(password, saltRounds, function(err, hash) {
+                if(err){
+                    console.log('There was an error with bcrypt', err);
+                } else{
+                    // Store hash in your password DB.
+                    const query = "INSERT INTO students (id, fname, lname, email, password,year_of_study,role) VALUES ('" +
+                    id + "', '" + fname + "', '" + lname + "', '" + email + "', '" + hash + "', '"+parseInt(year_of_study)+"','"+role+"')";
 
-                    res.send({
-                        message: "registration successful",
-                    })
+                    client.query(query,(err, result)=>{
+                        if (err) {
+                            console.error('Error executing query:', err);
+                        } else {
+                            console.log('Register executed successfully.');
+                            console.log('Inserted rows:', result.rowCount);
+
+                            res.send({
+                                message: "registration successful",
+                            })
+                        }
+                    });     
                 }
-            });     
+                });
+            }
         }
-    });
+    })
+
+    
 
     
 
@@ -85,7 +102,6 @@ app.post('/login', (req, res) =>{
     var hash = "";
 
     console.log(req.body);
-
 
     const getHash = "SELECT password FROM students WHERE id ='"+id+"'";
     

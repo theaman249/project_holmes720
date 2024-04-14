@@ -61,7 +61,8 @@ const client = new Client({
           lname VARCHAR(100),
           email VARCHAR(60),
           password VARCHAR(100),
-          year_of_study INT
+          year_of_study INT,
+          role VARCHAR(15)
         );
 
         CREATE TABLE IF NOT EXISTS modules(
