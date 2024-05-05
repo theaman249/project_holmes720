@@ -60,15 +60,16 @@ const client = new Client({
           fname VARCHAR(100),
           lname VARCHAR(100),
           email VARCHAR(60),
-          password VARCHAR(100),
+          password VARCHAR(500),
           year_of_study INT,
           role VARCHAR(15)
         );
 
         CREATE TABLE IF NOT EXISTS modules(
           id VARCHAR(6) PRIMARY KEY,
-          name VARCHAR(100),
-          year_of_study INT
+          name VARCHAR(500),
+          year_of_study INT,
+          semester INT
         );
 
         CREATE TABLE IF NOT EXISTS students_modules(
