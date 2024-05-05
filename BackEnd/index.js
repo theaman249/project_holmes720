@@ -1,3 +1,5 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const client = require('./conn');
@@ -8,9 +10,13 @@ const saltRounds = 10;
 const app = express();
 const port = 3000;
 
+dotenv.config({path: '.env'})
+
 app.use(cors());
 app.use(bodyParser.json()); //for json data
 app.use(bodyParser.urlencoded({ extended: false })); //for URL encoded data
+
+
 
 app.get('/', (req, res) => {
 
@@ -109,7 +115,7 @@ app.post('/login', (req, res) =>{
         if(err){
             console.error('Error executing query:', err);
         } else{
-            console.log(result.rows[0].password);
+            //console.log(result.rows[0].password);
             hash = result.rows[0].password;
 
             bcrypt.compare(password, hash, function(err, result) {
@@ -129,10 +135,68 @@ app.post('/login', (req, res) =>{
                 }
             });
         }
-    });
-
-    
-
-    
-    
+    }); 
 });
+
+app.get('/test', async (req, res) => {
+
+    console.log(process.env.JWT_SECRET_KEY);
+
+    res.status(200).send({
+        message: 'KZN',
+    })
+});
+
+app.get('/test', async (req, res) => {
+
+    console.log(process.env.JWT_SECRET_KEY);
+
+    res.status(200).send({
+        message: 'KZN',
+    })
+});
+
+app.get('/getAllUserData', (req,res) =>{
+
+    const getAllUsersDataQuery = "SELECT * FROM students";
+
+    client.query(getAllUsersDataQuery, (err, result) =>{
+
+        if(err){
+            res.status(500).send({
+                message: "unable to get all user data"
+            })
+        }
+        else{
+
+            var arr_return = [];
+
+            for(let i=0;i<result.rows.length;++i){
+
+                var obj = {
+                    id: result.rows[i].id,
+                    name: result.rows[i].fname,
+                    surname: result.rows[i].lname,
+                    email: result.rows[i].email,
+                    year_of_study: result.rows[i].year_of_study,
+                    role: result.rows[i].role
+                }
+
+                arr_return.push(obj);
+
+            }
+
+            res.status(200).send({
+                data: arr_return
+            })
+        }
+    })
+
+});
+
+app.get('/getUserData', async (req,res)=>{
+
+    
+
+    const getUserDataQuery = ""
+})

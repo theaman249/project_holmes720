@@ -157,7 +157,7 @@ function submitForm(){
                 console.log(xhr.responseText);
 
                 if (xhr.status === 200) {
-                    alert(xhr.responseText);
+                    //alert(xhr.responseText);
                     console.log(xhr);
                     successOut.innerHTML = "";
                 }    

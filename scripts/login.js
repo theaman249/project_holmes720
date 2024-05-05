@@ -1,6 +1,11 @@
 const loginStudentNumber = document.getElementById("id_logStudentNumberInput");
 const loginPassword = document.getElementById("id_logPasswordInput");
 
+function test(){
+    console.log("testing in login page");
+}
+
+
 function login(){
 
     const successOut = document.getElementById("id_logSuccessOut");
@@ -27,6 +32,7 @@ function login(){
             if (xhr.status === 200) {
                 alert('Welcome!');
                 successOut.innerHTML = "";
+                window.location.replace("student_module_management.html");
             } 
             else if(xhr.status === 401){
                 alert('Incorrect username or password provided');

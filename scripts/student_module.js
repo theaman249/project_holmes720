@@ -22,5 +22,11 @@ function unload(){
 
 function getData(){
     let xhr = new XMLHttpRequest();
+
+    xhr.open("GET", "http://localhost:3000/getAllUserData");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    
 }
 
