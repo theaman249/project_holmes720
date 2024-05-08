@@ -10,6 +10,7 @@ function login(){
 
     const successOut = document.getElementById("id_logSuccessOut");
     successOut.innerHTML = "logging in....";
+    const id = document.getElementById("id_logStudentNumberInput").value;
 
     const jsonObj={
         id: loginStudentNumber.value,
@@ -32,6 +33,14 @@ function login(){
             if (xhr.status === 200) {
                 alert('Welcome!');
                 successOut.innerHTML = "";
+
+                const jsonResponse = JSON.parse(xhr.responseText);
+
+                const jwtToken = jsonResponse.jwt_token;
+                
+                //set the JWT cookie
+                setCookie("jwt_token",jwtToken);
+                setCookie("id",id);
                 window.location.replace("student_module_management.html");
             } 
             else if(xhr.status === 401){
@@ -47,6 +56,34 @@ function login(){
 
     xhr.send(jsonString);
 }
+
+function setCookie(name, value) {
+    var expirationDate = new Date();
+    // Set the expiration date to 1 day from the current date
+    expirationDate.setDate(expirationDate.getDate() + 1);
+  
+    var cookieString = name + '=' + encodeURIComponent(value) + '; expires=' + expirationDate.toUTCString() + '; path=/';
+  
+    document.cookie = cookieString;
+}
+
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+}
+
 
 document.getElementById("loginForm").addEventListener("submit", function(event) {
     // Prevent the default form submission behavior

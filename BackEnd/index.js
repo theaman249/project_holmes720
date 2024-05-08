@@ -6,6 +6,7 @@ const client = require('./conn');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = 3000;
@@ -107,25 +108,36 @@ app.post('/login', (req, res) =>{
     const {id, password} = req.body;
     var hash = "";
 
-    console.log(req.body);
+    //console.log(req.body);
 
-    const getHash = "SELECT password FROM students WHERE id ='"+id+"'";
+    const getHash = "SELECT * FROM students WHERE id ='"+id+"'";
     
-    client.query(getHash, (err,result) =>{
+    client.query(getHash, (err,results) =>{
         if(err){
             console.error('Error executing query:', err);
         } else{
             //console.log(result.rows[0].password);
-            hash = result.rows[0].password;
+            hash = results.rows[0].password;
 
             bcrypt.compare(password, hash, function(err, result) {
                 if (err) {
                     console.log('There was an error with bcrypt', err);
                 } else {
                     if (result) {
-                       res.status(200).send({
-                        message: "login successful",
-                       });
+
+                        //generate access token
+                        const payload ={
+                            id: results.rows[0].id,
+                            emai: results.rows[0].email
+                        }
+
+                        const options = { expiresIn: '5h' };
+                        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, options);
+                        
+                        res.status(200).send({
+                            message: "login successful",
+                            jwt_token: token
+                        });
                     } 
                     else {
                         res.status(401).send({
@@ -138,25 +150,76 @@ app.post('/login', (req, res) =>{
     }); 
 });
 
-app.get('/test', async (req, res) => {
+function verifyAccessToken(token) {
 
-    console.log(process.env.JWT_SECRET_KEY);
+    const secret = process.env.JWT_SECRET_KEY;
+  
+    try {
+      const decoded = jwt.verify(token, secret);
+      return { success: true, data: decoded };
+    } 
+    catch (error) 
+    {
+      return { success: false, error: error.message };
+    }
+}
+
+/**
+ * This is the middleware that we will inject on all requests to authenticate
+ * the jwt token. The jwt token is returned in the login payload and
+ * saved as a cookie on the client side.
+ * 
+ * If the token is valid, we store the decoded payload in req.user and 
+ * proceed with the request. If the token is invalid, we return a 403 
+ * Forbidden status with an error message.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns the Data that
+ */
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+  
+    if (!token) {
+      return res.sendStatus(401);
+    }
+  
+    const result = verifyAccessToken(token);
+  
+    if (!result.success) { //forbidden
+      return res.status(403).json({ error: result.error });
+    }
+  
+    req.user = result.data;
+    next(); //the middleware actually forms part of the function that is using it.
+}
+
+app.get('/test', async (req, res) => {
 
     res.status(200).send({
         message: 'KZN',
     })
 });
 
-app.get('/test', async (req, res) => {
+/**
+ * sample of user:
+ * "user": {
+        "id": "u18105883",
+        "emai": "theaman249@gmail.com",
+        "iat": 1714944075,
+        "exp": 1714962075
+    }
+    The middleware, through verifyAccessToken, actually decrypts the token and returns the original
+    values. Which is pretty ne 
+*/
 
-    console.log(process.env.JWT_SECRET_KEY);
-
-    res.status(200).send({
-        message: 'KZN',
-    })
+app.get('/protected', authenticateToken, (req, res) => {
+    res.json({ message: 'Welcome to the protected route!', user: req.user });
 });
 
-app.get('/getAllUserData', (req,res) =>{
+app.get('/getAllUserData',authenticateToken, (req,res) =>{
 
     const getAllUsersDataQuery = "SELECT * FROM students";
 
@@ -194,9 +257,43 @@ app.get('/getAllUserData', (req,res) =>{
 
 });
 
-app.get('/getUserData', async (req,res)=>{
+app.post('/getUserData',authenticateToken,async (req,res)=>{
+
+    const {id} = req.body;
+
+    const getUserDataQuery = "SELECT * FROM students WHERE id ='"+id+"'";
+
+    client.query(getUserDataQuery, (err, result) =>{
+
+        if(err){
+            res.status(500).send({
+                message: "unable to get user data"
+            })
+        }
+        else{
+
+            var arr_return = [];
+
+            for(let i=0;i<result.rows.length;++i){
+
+                var obj = {
+                    id: result.rows[i].id,
+                    name: result.rows[i].fname,
+                    surname: result.rows[i].lname,
+                    email: result.rows[i].email,
+                    year_of_study: result.rows[i].year_of_study,
+                    role: result.rows[i].role
+                }
+
+                arr_return.push(obj);
+
+            }
+
+            res.status(200).send({
+                data: arr_return
+            })
+        }
+    })
 
     
-
-    const getUserDataQuery = ""
 })
