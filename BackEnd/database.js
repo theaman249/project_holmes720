@@ -32,7 +32,9 @@ const client = new Client({
       }
 
       client.end();
-    } else {
+    } 
+    else 
+    {
       console.log('The database "cos720_db" does not exist.');
       console.log('Creating database cos720_db.....');
 
@@ -73,7 +75,8 @@ const client = new Client({
         );
 
         CREATE TABLE IF NOT EXISTS students_modules(
-          student_id VARCHAR(8) REFERENCES students(id),
+          
+          student_id VARCHAR(9) REFERENCES students(id),
           module_id VARCHAR(6) REFERENCES modules(id),
           CONSTRAINT students_modules_pk PRIMARY KEY(module_id, student_id)
         );

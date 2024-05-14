@@ -96,11 +96,6 @@ app.post('/register', (req, res) =>{
             }
         }
     })
-
-    
-
-    
-
 });
 
 app.post('/login', (req, res) =>{
@@ -219,6 +214,7 @@ app.get('/protected', authenticateToken, (req, res) => {
     res.json({ message: 'Welcome to the protected route!', user: req.user });
 });
 
+
 app.get('/getAllUserData',authenticateToken, (req,res) =>{
 
     const getAllUsersDataQuery = "SELECT * FROM students";
@@ -243,6 +239,83 @@ app.get('/getAllUserData',authenticateToken, (req,res) =>{
                     email: result.rows[i].email,
                     year_of_study: result.rows[i].year_of_study,
                     role: result.rows[i].role
+                }
+
+                arr_return.push(obj);
+
+            }
+
+            res.status(200).send({
+                data: arr_return
+            })
+        }
+    })
+
+});
+
+app.post('/getModulesUserTakes', authenticateToken, async(req,res) =>{
+
+    /**
+     * The following implementation is a direct mapping approach 
+    */
+
+    const { id } = req.body;
+
+    try {
+        const { rows } = await client.query(`
+        SELECT m.name AS module_name, m.id AS module_id
+        FROM students_modules sm
+        INNER JOIN modules m ON sm.module_id = m.id
+        WHERE sm.student_id = $1;
+    `, [id]);
+    
+    if (rows.length > 0) {
+        const arr_return = rows.map(row => ({
+            id: row.module_id,
+            name: row.module_name
+        }));
+
+        res.status(200).send({
+            data: arr_return
+        });
+    } else {
+        res.status(404).send({
+            message: "No modules found for the given student ID"
+        });
+    }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: "Unable to get module data"
+        });
+    }
+    
+
+})
+
+app.post('/getModuleDetail', authenticateToken, async (req, res) =>{
+    const {id} = req.body;
+
+    const getModuleQuery = "SELECT * FROM modules WHERE id ='"+id+"'";
+
+    client.query(getModuleQuery, (err, result) =>{
+
+        if(err){
+            res.status(500).send({
+                message: "unable to get module data"
+            })
+        }
+        else{
+
+            var arr_return = [];
+
+            for(let i=0;i<result.rows.length;++i){
+
+                var obj = {
+                    id: result.rows[i].id,
+                    name: result.rows[i].name,
+                    surname: result.rows[i].year_of_study,
+                    email: result.rows[i].semester
                 }
 
                 arr_return.push(obj);
@@ -297,3 +370,6 @@ app.post('/getUserData',authenticateToken,async (req,res)=>{
 
     
 })
+
+
+

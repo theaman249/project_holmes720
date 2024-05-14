@@ -1,4 +1,5 @@
 var myVar;
+const id_moduleSelectionArea = document.getElementById("moduleSectionArea");
 
 function loading(){
     console.log("loading....");
@@ -78,8 +79,6 @@ function getData(){
 
     xhr.send(jsonString);
 }
-
-
 
 function setCookie(name, value) {
     var expirationDate = new Date();
