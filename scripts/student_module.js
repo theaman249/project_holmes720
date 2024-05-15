@@ -139,10 +139,38 @@ function getModulesStudentTakes(){
                 console.log(data);
 
                 for(let i=0;i<data.length;++i){
-                    const module_id = data[i].module_id;
-                    const module_name = data[i].module_name;
+                    const module_id = data[i].id;
+                    const module_name = data[i].name;
                     const semester = data[i].semester;
                     const year_of_study = data[i].year_of_study;
+
+                    console.log(module_name);
+
+                    id_moduleSelectionArea.innerHTML += `
+                    <div class='arrayDivModules' style = "display:flex; gap:10px">
+
+                        <span style = "display:flex; flex-direction: column">
+                            <label style = "font-weight:bold">Module code</label>
+                            <input type="text" value="${module_id}" style="width: 65px; margin-top: 5px;" readonly>
+                        </span>
+                    
+                        <span style = "display:flex; flex-direction: column">
+                            <label style = "font-weight:bold">Module name</label>
+                            <input type="text" value="${module_name}" style="width: 220px; margin-top: 5px;" readonly>
+                        </span>
+                    
+                        <span style = "display:flex; flex-direction: column">
+                            <label style = "font-weight:bold">Semester</label>
+                            <input type="text" value="${semester}" style="width: 20px; margin-top: 5px;" readonly>
+                        </span>
+
+                        <span style = "display:flex; flex-direction: column">
+                            <label style = "font-weight:bold; margin-bottom:4px">Drop</label>
+                            <button class = 'arrayModuleBtns' style = "width: 50px; background-color:red";>X</button>
+                        </span>
+                        
+                    </div><br>
+                    `;
                 }
             }
             else if(xhr.status === 401)
