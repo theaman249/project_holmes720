@@ -254,25 +254,29 @@ app.get('/getAllUserData',authenticateToken, (req,res) =>{
 });
 
 app.post('/getModulesUserTakes', authenticateToken, async(req,res) =>{
-
-    /**
-     * The following implementation is a direct mapping approach 
-    */
-
     const { id } = req.body;
 
     try {
         const { rows } = await client.query(`
-        SELECT m.name AS module_name, m.id AS module_id
-        FROM students_modules sm
-        INNER JOIN modules m ON sm.module_id = m.id
-        WHERE sm.student_id = $1;
+        SELECT 
+            m.name AS module_name, 
+            m.id AS module_id,
+            m.year_of_study,
+            m.semester
+        FROM 
+            students_modules sm
+        INNER JOIN 
+            modules m ON sm.module_id = m.id
+        WHERE 
+            sm.student_id = $1;
     `, [id]);
     
     if (rows.length > 0) {
         const arr_return = rows.map(row => ({
             id: row.module_id,
-            name: row.module_name
+            name: row.module_name,
+            semester: row.semester,
+            year_of_study: row.year_of_study,
         }));
 
         res.status(200).send({
@@ -289,8 +293,6 @@ app.post('/getModulesUserTakes', authenticateToken, async(req,res) =>{
             message: "Unable to get module data"
         });
     }
-    
-
 })
 
 app.post('/getModuleDetail', authenticateToken, async (req, res) =>{

@@ -28,6 +28,13 @@ function getData(){
     const token = getCookie('jwt_token');
     const id = getCookie('id');
 
+    const id_studentDetailsID = document.getElementById("studentDetails_id");
+    const id_studentDetailsName = document.getElementById("studentDetails_name");
+    const id_studentDetailsSurname = document.getElementById("studentDetails_surname");
+    const id_studentDetailsYOS = document.getElementById("studentDetails_YOS");
+    const id_studentDetailsRole = document.getElementById("studentDetails_role");
+    const id_studentDetailsEmail = document.getElementById("studentDetails_email");
+
     // Check if token exists
     if (!token) {
       alert('WARNING: Unable to get JWT Token cookie');
@@ -63,9 +70,80 @@ function getData(){
                 const data = jsonResponse.data;
 
                 console.log(data[0]);
-                alert("Did I win?");
                 unload();
+                
+                id_studentDetailsID.innerHTML = data[0].id;
+                id_studentDetailsName.innerHTML = data[0].name;
+                id_studentDetailsSurname.innerHTML = data[0].surname;
+                id_studentDetailsEmail.innerHTML = data[0].email
+                id_studentDetailsYOS.innerHTML = data[0].year_of_study;
+                id_studentDetailsRole.innerHTML = data[0].role;
 
+                getModulesStudentTakes();
+            }
+            else if(xhr.status === 401)
+            {
+                const jsonResponse = JSON.parse(xhr.responseText);
+
+                alert(jsonResponse);
+            }
+
+        }
+    };
+
+    xhr.send(jsonString);
+}
+
+
+function getModulesStudentTakes(){
+    const token = getCookie('jwt_token');
+    const id = getCookie('id');
+
+    const id_moduleSelectionArea = document.getElementById("moduleSectionArea");
+
+
+    // Check if token exists
+    if (!token) {
+      alert('WARNING: Unable to get JWT Token cookie');
+      return;
+    }
+    else if(!id){
+        alert('WARNING: Unable to get id cookie');
+        return;
+    }
+
+    const jsonObj = {
+        id:id
+    }
+
+    const jsonString = JSON.stringify(jsonObj)
+
+
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("POST", "http://localhost:3000/getModulesUserTakes");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            //console.log(xhr.status);
+            //console.log(xhr.responseText);
+
+            if (xhr.status === 200) {
+                const jsonResponse = JSON.parse(xhr.responseText);
+                
+                const data = jsonResponse.data;
+
+                console.log(data);
+
+                for(let i=0;i<data.length;++i){
+                    const module_id = data[i].module_id;
+                    const module_name = data[i].module_name;
+                    const semester = data[i].semester;
+                    const year_of_study = data[i].year_of_study;
+                }
             }
             else if(xhr.status === 401)
             {

@@ -74,8 +74,7 @@ const client = new Client({
           semester INT
         );
 
-        CREATE TABLE IF NOT EXISTS students_modules(
-          
+        CREATE TABLE IF NOT EXISTS students_modules(    
           student_id VARCHAR(9) REFERENCES students(id),
           module_id VARCHAR(6) REFERENCES modules(id),
           CONSTRAINT students_modules_pk PRIMARY KEY(module_id, student_id)
