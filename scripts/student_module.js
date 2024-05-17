@@ -166,7 +166,7 @@ function getModulesStudentTakes(){
 
                         <span style = "display:flex; flex-direction: column">
                             <label style = "font-weight:bold; margin-bottom:4px">Drop</label>
-                            <button class = 'arrayModuleBtns' style = "width: 50px; background-color:red";>X</button>
+                            <button class = 'arrayModuleBtns' onclick = drop(${i}) style = "width: 50px; background-color:red";>X</button>
                         </span>
                         
                     </div><br>
@@ -184,6 +184,27 @@ function getModulesStudentTakes(){
     };
 
     xhr.send(jsonString);
+}
+
+/**
+ * index: int This is the index of the selected html element
+ */
+
+function drop(index){
+    const class_arrayDivModules = document.getElementsByClassName("arrayDivModules");
+    const class_arrayModuleBtns = document.getElementsByClassName("arrayModuleBtns");
+
+    if (index >= 0 && index < class_arrayDivModules.length &&  class_arrayDivModules[index].style.backgroundColor != "red") 
+    {
+        class_arrayDivModules[index].style.backgroundColor = "red";
+        class_arrayModuleBtns[index].textContent = "enroll";
+        class_arrayModuleBtns[index].style.backgroundColor = "green";
+    } 
+    else if( class_arrayDivModules[index].style.backgroundColor == "red"){
+        class_arrayDivModules[index].style.backgroundColor = "white";
+        class_arrayModuleBtns[index].textContent = "X";
+        class_arrayModuleBtns[index].style.backgroundColor = "red";
+    }
 }
 
 function setCookie(name, value) {
