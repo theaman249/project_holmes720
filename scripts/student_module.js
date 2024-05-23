@@ -1,5 +1,6 @@
 var myVar;
 const id_moduleSelectionArea = document.getElementById("moduleSectionArea");
+let arrDeregisteredPool = [];
 
 function loading(){
     console.log("loading....");
@@ -147,11 +148,11 @@ function getModulesStudentTakes(){
                     console.log(module_name);
 
                     id_moduleSelectionArea.innerHTML += `
-                    <div class='arrayDivModules' style = "display:flex; gap:10px">
+                    <div class='arrayDivModules' style = "display:flex; gap:10px; border-style:solid; padding: 8px;">
 
                         <span style = "display:flex; flex-direction: column">
                             <label style = "font-weight:bold">Module code</label>
-                            <input type="text" value="${module_id}" style="width: 65px; margin-top: 5px;" readonly>
+                            <input type="text" value="${module_id}" style="width: 65px; margin-top: 5px;" class = 'arrayModuleCodes' readonly>
                         </span>
                     
                         <span style = "display:flex; flex-direction: column">
@@ -186,26 +187,177 @@ function getModulesStudentTakes(){
     xhr.send(jsonString);
 }
 
+function commitDeregistration(){
+
+    //deregisterPopUp();
+
+    if(arrDeregisteredPool.length === 0){
+        alert('Nothing to commit');
+        return;
+    }
+    else{
+        deregisterPopUp();
+    }
+
+    
+}
+
+function deregisterPopUp(){
+
+    const chlPopUp = document.createElement('div');
+    chlPopUp.id = "deregistrationPopUp";
+    chlPopUp.style.position = "absolute";
+    chlPopUp.style.top = "-50px";
+    chlPopUp.style.left = "50%";
+    chlPopUp.style.transform = "translateX(-50%)";
+    chlPopUp.style.background = "white";
+    chlPopUp.style.border = "1px solid #ccc";
+    chlPopUp.style.padding = "10px";
+    chlPopUp.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    chlPopUp.style.zIndex = "1000";
+    chlPopUp.style.width = "300px";
+    chlPopUp.style.height = "100px";
+    chlPopUp.style.alignItems = "center";
+    chlPopUp.style.justifyContent = "center";
+    chlPopUp.style.textAlign = "center";
+    
+    const label = document.createElement('label');
+    label.textContent = "Save Changes?";
+    label.style.color = "red";
+    label.style.marginBottom = "8px";
+    chlPopUp.appendChild(label);
+
+    const br = document.createElement('br');
+    chlPopUp.appendChild(br);
+    
+    const yesButton = document.createElement('button');
+    yesButton.textContent = "Yes";
+    yesButton.className = "btn btn-primary";
+    yesButton.type = "submit";
+    yesButton.style.marginRight ="16px";
+    yesButton.onclick = yesDeregistration;
+    chlPopUp.appendChild(yesButton);
+    
+    const noButton = document.createElement('button');
+    noButton.textContent = "No";
+    noButton.className = "btn btn-primary";
+    noButton.type = "submit";
+    noButton.onclick = noDeregistration;
+    chlPopUp.appendChild(noButton);
+
+    id_moduleSelectionArea.appendChild(chlPopUp);
+
+    // id_moduleSelectionArea.appendChild(
+    // `<div style = '
+    // position: absolute;
+    // top: -50px;
+    // left: 50%;
+    // transform: translateX(-50%);
+    // background: white;
+    // border: 1px solid #ccc;
+    // padding: 10px;
+    // box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    // z-index: 1000;
+    // width: 300px;
+    // height: 100px;
+    // align-items: center;
+    // justify-content: center;
+    // text-align: center; /* Center align text horizontally */
+    // id = 'deregistrationPopUp'
+    // '> 
+    //     <label style = 'color:red; margin-bottom:8px'>Save Changes?</label><br>
+    //     <button class="btn btn-primary" type="submit" onclick = "yesDeregistration()">Yes</button> <button class="btn btn-primary" type="submit" onclieck ="noDeregistration()">No</button>
+    // </div>`)
+}
+
+
+function yesDeregistration(){
+
+    id_moduleSelectionArea.removeChild(document.getElementById('deregistrationPopUp'));
+
+    const id = getCookie('id');
+    const token = getCookie('jwt_token');
+    //alert(id + 'wants to deregister from: '+arrDeregisteredPool);
+
+    //pop-up dissappears
+
+    const jsonObj = {
+        id:id,
+        arr_modules:arrDeregisteredPool
+    }
+
+    const jsonString = JSON.stringify(jsonObj)
+
+
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("POST", "http://localhost:3000/deregisterModules");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+
+            if (xhr.status === 200) {
+                const jsonResponse = JSON.parse(xhr.responseText);
+                
+                const data = jsonResponse.data;
+
+                console.log(data);
+                id_moduleSelectionArea.innerHTML ="";
+                getModulesStudentTakes();
+            }
+            else if(xhr.status === 401)
+            {
+                const jsonResponse = JSON.parse(xhr.responseText);
+
+                alert("Failed to de-register module");
+            }
+
+        }
+    };
+
+    xhr.send(jsonString);
+}
+
+function noDeregistration(){
+    id_moduleSelectionArea.removeChild(document.getElementById('deregistrationPopUp'));
+}
+
+
+
 /**
  * index: int This is the index of the selected html element
  */
 
+const dropColorRGB = "rgb(236, 98, 98)";
+
 function drop(index){
     const class_arrayDivModules = document.getElementsByClassName("arrayDivModules");
     const class_arrayModuleBtns = document.getElementsByClassName("arrayModuleBtns");
+    const class_arrayModuleCodes = document.getElementsByClassName("arrayModuleCodes"); //inputs that contain the module codes
 
-    if (index >= 0 && index < class_arrayDivModules.length &&  class_arrayDivModules[index].style.backgroundColor != "red") 
+    if (index >= 0 && index < class_arrayDivModules.length &&  class_arrayDivModules[index].style.backgroundColor != dropColorRGB) 
     {
-        class_arrayDivModules[index].style.backgroundColor = "red";
+        class_arrayDivModules[index].style.backgroundColor = dropColorRGB;
         class_arrayModuleBtns[index].textContent = "enroll";
         class_arrayModuleBtns[index].style.backgroundColor = "green";
+        arrDeregisteredPool.push(class_arrayModuleCodes[index].value);
+
+        console.log(arrDeregisteredPool);
     } 
-    else if( class_arrayDivModules[index].style.backgroundColor == "red"){
+    else if( class_arrayDivModules[index].style.backgroundColor == dropColorRGB){
         class_arrayDivModules[index].style.backgroundColor = "white";
         class_arrayModuleBtns[index].textContent = "X";
         class_arrayModuleBtns[index].style.backgroundColor = "red";
+
+        removeModuleFromDeregisteredPool(class_arrayModuleCodes[index].value);
+        console.log(arrDeregisteredPool);
     }
 }
+
+
 
 function setCookie(name, value) {
     var expirationDate = new Date();
@@ -232,4 +384,12 @@ function getCookie(cname) {
       }
     }
     return "";
+}
+
+function removeModuleFromDeregisteredPool(module_id){
+    //console.log('removing'+  module_id);
+    const index = arrDeregisteredPool.indexOf(module_id);
+    if (index !== -1) {
+        arrDeregisteredPool.splice(index, 1);
+    }
 }

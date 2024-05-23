@@ -52,6 +52,7 @@ const client = new Client({
                 await clientNew.query(`
                     INSERT INTO students_modules VALUES
                         ('u18105883', 'COS330'),
+                        ('u18105883', 'COS301'),
                         ('u18105883', 'COS332');
                 `);
 

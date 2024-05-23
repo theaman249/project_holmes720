@@ -210,6 +210,47 @@ app.get('/test', async (req, res) => {
     values. Which is pretty ne 
 */
 
+app.post('/deregisterModules', authenticateToken, (req, res) => {
+    const { id, arr_modules } = req.body;
+
+    console.log(req.body);
+    //console.log(arr_modules.length);
+
+    // Array to hold all promises
+    const promises = [];
+
+    for (let i = 0; i < arr_modules.length; ++i) {
+        //console.log(i);
+        const deregisterModulesQuery = `DELETE FROM students_modules WHERE student_id = '${id}' AND module_id = '${arr_modules[i]}' `;
+        // Push each query promise to the array
+        promises.push(new Promise((resolve, reject) => {
+            client.query(deregisterModulesQuery, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        }));
+    }
+
+    // Wait for all promises to resolve
+    Promise.all(promises)
+        .then(() => {
+            res.status(200).send({
+                id: id,
+                message: "successfully deregistered student"
+            });
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send({
+                message: "unable to execute query"
+            });
+        });
+});
+
+
 app.get('/protected', authenticateToken, (req, res) => {
     res.json({ message: 'Welcome to the protected route!', user: req.user });
 });
@@ -223,7 +264,7 @@ app.get('/getAllUserData',authenticateToken, (req,res) =>{
 
         if(err){
             res.status(500).send({
-                message: "unable to get all user data"
+                message: "unable to execute query"
             })
         }
         else{
