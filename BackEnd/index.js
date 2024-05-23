@@ -210,10 +210,46 @@ app.get('/test', async (req, res) => {
     values. Which is pretty ne 
 */
 
+app.post('/getModulesForAYear', authenticateToken ,(req, res) =>{
+
+    const {year_of_study} = req.body;
+
+    const getModulesForAYearQuery = `SELECT * FROM modules WHERE year_of_study = ${year_of_study}`;
+
+    client.query(getModulesForAYearQuery, (err,result) =>{
+        if(err){
+            res.status(500).send({
+                message: "unable to get module data"
+            })
+        }
+        else{
+            var arr_return = [];
+
+            for(let i=0;i<result.rows.length;++i){
+
+                var obj = {
+                    id: result.rows[i].id,
+                    name: result.rows[i].name,
+                    year_of_study: result.rows[i].year_of_study,
+                    semester: result.rows[i].semester
+                }
+
+                arr_return.push(obj);
+
+            }
+
+            res.status(200).send({
+                data: arr_return
+            })
+        }
+    })
+
+})
+
 app.post('/deregisterModules', authenticateToken, (req, res) => {
     const { id, arr_modules } = req.body;
 
-    console.log(req.body);
+    //console.log(req.body);
     //console.log(arr_modules.length);
 
     // Array to hold all promises
@@ -357,8 +393,8 @@ app.post('/getModuleDetail', authenticateToken, async (req, res) =>{
                 var obj = {
                     id: result.rows[i].id,
                     name: result.rows[i].name,
-                    surname: result.rows[i].year_of_study,
-                    email: result.rows[i].semester
+                    year_of_study: result.rows[i].year_of_study,
+                    semester: result.rows[i].semester
                 }
 
                 arr_return.push(obj);

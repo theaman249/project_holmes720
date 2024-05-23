@@ -36,6 +36,7 @@ function getData(){
     const id_studentDetailsRole = document.getElementById("studentDetails_role");
     const id_studentDetailsEmail = document.getElementById("studentDetails_email");
 
+
     // Check if token exists
     if (!token) {
       alert('WARNING: Unable to get JWT Token cookie');
@@ -79,6 +80,9 @@ function getData(){
                 id_studentDetailsEmail.innerHTML = data[0].email
                 id_studentDetailsYOS.innerHTML = data[0].year_of_study;
                 id_studentDetailsRole.innerHTML = data[0].role;
+
+                //save the user's current year of study
+                setCookie('year_of_study', data[0].year_of_study)
 
                 getModulesStudentTakes();
             }
@@ -187,6 +191,57 @@ function getModulesStudentTakes(){
     xhr.send(jsonString);
 }
 
+function getModulesForAYear(){
+
+    console.log('getting modules...');
+    const year_of_study = getCookie('year_of_study');
+    const token = getCookie('jwt_token');
+
+    if (getCookie('student_modules')) {
+        //console.log("Student modules already set in the cookie:", student_modules);
+        return; // Exit the function if the cookie is set
+    }
+
+    const jsonObj = {
+        year_of_study:year_of_study
+    }
+
+    const jsonString = JSON.stringify(jsonObj)
+
+
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("POST", "http://localhost:3000/getModulesForAYear");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+
+            if (xhr.status === 200) {
+                const jsonResponse = JSON.parse(xhr.responseText);
+
+                const data = jsonResponse.data;
+
+                console.log(data);
+
+                setCookie('student_modules', JSON.stringify(jsonResponse)); // Store the response as a string
+            }
+            else if(xhr.status === 401)
+            {
+                const jsonResponse = JSON.parse(xhr.responseText);
+
+                alert(jsonResponse);
+            }
+
+        }
+    };
+
+    xhr.send(jsonString);
+
+}
+
 function commitDeregistration(){
 
     //deregisterPopUp();
@@ -200,6 +255,89 @@ function commitDeregistration(){
     }
 
     
+}
+
+function commitRegistration(){
+
+    //getModules based on the student year
+    getModulesForAYear();
+
+    console.log(getStudentModulesCookieAsJsonObject());
+
+    const chlPopUp = document.createElement('div');
+    chlPopUp.id = "registrationPopUp";
+    chlPopUp.style.position = "fixed"; 
+    chlPopUp.style.top = "50%"; 
+    chlPopUp.style.left = "50%"; 
+    chlPopUp.style.transform = "translate(-50%, -50%)"; 
+    chlPopUp.style.background = "white";
+    chlPopUp.style.border = "1px solid #ccc";
+    chlPopUp.style.padding = "10px";
+    chlPopUp.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    chlPopUp.style.zIndex = "1000";
+    chlPopUp.style.width = "500px";
+    chlPopUp.style.height = "500px";
+    // chlPopUp.style.alignItems = "center";
+    // chlPopUp.style.justifyContent = "center";
+    // chlPopUp.style.textAlign = "center";
+    chlPopUp.style.borderRadius = "16px";
+
+    const header = document.createElement('h2');
+    header.textContent = "Enroll for a Module";
+
+    const headerDiv = document.createElement('div');
+    headerDiv.style.textAlign = "center";
+    headerDiv.style.marginBottom = "32px";
+    headerDiv.appendChild(header); 
+    chlPopUp.appendChild(headerDiv);
+
+    const optionsDiv = document.createElement('div');
+    optionsDiv.id = "optionsDiv"; //optionsDiv has many optionDivs
+    chlPopUp.appendChild(optionsDiv);
+
+
+    //br
+    chlPopUp.appendChild(document.createElement('br'));
+
+    const closeBtn = document.createElement('button');
+    closeBtn.innerText = "Close";
+    closeBtn.className = "btn btn-success";
+    closeBtn.style.marginRight = "16px";
+    closeBtn.onclick = closeRegistrationPopup;
+    chlPopUp.appendChild(closeBtn);
+
+    const addButton = document.createElement('button');
+    addButton.innerText = "Add";
+    addButton.className = "btn btn-success";
+    addButton.onclick = addOptionDiv;
+    chlPopUp.appendChild(addButton);
+
+    
+    
+
+    id_moduleSelectionArea.appendChild(chlPopUp);
+}
+
+function addOptionDiv(){
+    const optionDiv = document.createElement('div');
+    const id_optionsDiv = document.getElementById("optionsDiv");
+
+    optionDiv.id = "optionDiv";
+    optionDiv.className = "arrayOptionDivs";
+    optionDiv.style.marginTop = "16px";
+    optionDiv.innerHTML +=`
+    <select id="cars" style="width: 150px; height: 30px; border: 2px solid black;">
+        <option value="volvo" style="padding-left: 32px;">Volvovjhvjv</option>
+        <option value="saab" style="padding-left: 15px;">Saab</option>
+        <option value="opel" style="padding-left: 15px;">Opel</option>
+        <option value="audi" style="padding-left: 15px;">Audi</option>
+    </select></br>`
+
+    id_optionsDiv.appendChild(optionDiv);
+}
+
+function closeRegistrationPopup(){
+    id_moduleSelectionArea.removeChild(document.getElementById('registrationPopUp'))
 }
 
 function deregisterPopUp(){
@@ -384,6 +522,26 @@ function getCookie(cname) {
       }
     }
     return "";
+}
+
+/**
+ * 
+ * @returns An array of modules in the form of data:[{Obj1},{Obj2},{Obj3}]
+ */
+function getStudentModulesCookieAsJsonObject() {
+    const studentModulesCookie = getCookie('student_modules');
+    if (studentModulesCookie) {
+        try {
+            const studentModulesJson = JSON.parse(studentModulesCookie);
+            return studentModulesJson;
+        } catch (error) {
+            console.error('Failed to parse student_modules cookie:', error);
+            return null;
+        }
+    } else {
+        console.log('student_modules cookie is not set');
+        return null;
+    }
 }
 
 function removeModuleFromDeregisteredPool(module_id){
