@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
 const app = express();
 const port = 3000;
@@ -244,7 +245,110 @@ app.post('/getModulesForAYear', authenticateToken ,(req, res) =>{
         }
     })
 
-})
+});
+
+app.post('/registerModules', authenticateToken, async (req, res) =>{
+    const {id, arr_modules} = req.body;
+    const user = req.user; // Get user data from the request object
+    const promises = [];
+
+    let arr_clearedModulesForRegistration = [];
+
+    //console.log(req.body);
+
+    try {
+        const { rows } = await client.query(`
+        SELECT 
+            m.name AS module_name, 
+            m.id AS module_id,
+            m.year_of_study,
+            m.semester
+        FROM 
+            students_modules sm
+        INNER JOIN 
+            modules m ON sm.module_id = m.id
+        WHERE 
+            sm.student_id = $1;
+    `, [id])
+    
+    if (rows.length > 0) {
+        const data = rows.map(row => ({
+            id: row.module_id,
+            name: row.module_name,
+            semester: row.semester,
+            year_of_study: row.year_of_study,
+        }));
+
+        console.log(data);
+
+        for(let i =0;i<data.length;++i){
+
+            let found = false;
+
+            for(let k=0;k<arr_modules.length;++k)
+            {
+                if(arr_modules[k] === data[i].id){ //user is already registered for the module
+                    found = true;
+                    break;
+                }
+                
+                if(found === false){
+                    arr_clearedModulesForRegistration.push(arr_modules[k]);
+                }
+            }
+        }
+
+        //console.log(arr_clearedModulesForRegistration);
+
+        //link the module to the student.
+
+        for (let i = 0; i < arr_clearedModulesForRegistration.length; ++i) {
+            //console.log(i);
+            const registerModulesQuery = `INSERT INTO students_modules(student_id,module_id) VALUES('${id}','${arr_clearedModulesForRegistration[i]}')`;
+            // Push each query promise to the array
+            promises.push(new Promise((resolve, reject) => {
+                client.query(registerModulesQuery, (err, result) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            }));
+        }
+    
+        // Wait for all promises to resolve
+        Promise.all(promises)
+            .then(() => {
+                res.status(200).send({
+                    id: id,
+                    message: "successfully deregistered student"
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+                res.status(500).send({
+                    message: "unable to execute query"
+                });
+            });
+
+
+
+    } else {
+        res.status(404).send({
+            message: "No modules found for the given student ID"
+        });
+    }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            message: "query execution failed"
+        });
+    }
+
+    
+    
+});
 
 app.post('/deregisterModules', authenticateToken, (req, res) => {
     const { id, arr_modules } = req.body;

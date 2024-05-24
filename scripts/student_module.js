@@ -22,7 +22,6 @@ function unload(){
 
 }
 
-
 //name of jwt toke = jwt_token
 function getData(){
 
@@ -262,7 +261,7 @@ function commitRegistration(){
     //getModules based on the student year
     getModulesForAYear();
 
-    console.log(getStudentModulesCookieAsJsonObject());
+    //console.log(getStudentModulesCookieAsJsonObject());
 
     const chlPopUp = document.createElement('div');
     chlPopUp.id = "registrationPopUp";
@@ -312,28 +311,158 @@ function commitRegistration(){
     addButton.onclick = addOptionDiv;
     chlPopUp.appendChild(addButton);
 
-    
-    
+    const commitButton = document.createElement('button');
+    commitButton.innerText = "commit";
+    commitButton.className = "btn btn-success";
+    commitButton.style.marginLeft = "16px";
+    commitButton.onclick = commitModules;
+    chlPopUp.appendChild(commitButton);
 
     id_moduleSelectionArea.appendChild(chlPopUp);
 }
 
 function addOptionDiv(){
+
     const optionDiv = document.createElement('div');
     const id_optionsDiv = document.getElementById("optionsDiv");
 
+    const dataObj = getStudentModulesCookieAsJsonObject();
+    
     optionDiv.id = "optionDiv";
     optionDiv.className = "arrayOptionDivs";
     optionDiv.style.marginTop = "16px";
-    optionDiv.innerHTML +=`
-    <select id="cars" style="width: 150px; height: 30px; border: 2px solid black;">
-        <option value="volvo" style="padding-left: 32px;">Volvovjhvjv</option>
-        <option value="saab" style="padding-left: 15px;">Saab</option>
-        <option value="opel" style="padding-left: 15px;">Opel</option>
-        <option value="audi" style="padding-left: 15px;">Audi</option>
-    </select></br>`
+
+    const selectModule = document.createElement('select');
+    selectModule.className = 'arrayOptionsContainer';
+    selectModule.style.width = '250px';
+    selectModule.style.height = '30px';
+    selectModule.style.border = '2px solid black';
+
+    const nullOption = document.createElement('option');
+    nullOption.className = 'arrayOptions';
+    nullOption.value = 'null';
+    nullOption.textContent = 'null';
+    selectModule.appendChild(nullOption);
+
+    // Add options to the select element
+    for (let i = 0; i < dataObj.data.length; ++i) {
+
+        // console.log(dataObj);
+        // console.log(dataObj.data[0]);
+        const option = document.createElement('option');
+        option.className = 'arrayOptions';
+        option.value = dataObj.data[i].id;
+        option.textContent = dataObj.data[i].name;
+        selectModule.appendChild(option);
+    }
+
+    //add the select
+    optionDiv.appendChild(selectModule);
 
     id_optionsDiv.appendChild(optionDiv);
+}
+
+function commitModules(){
+    const class_arrayOptions = document.getElementsByClassName('arrayOptionsContainer');
+    const arr_registeredPool = [];
+    const id = getCookie('id');
+    const token = getCookie('jwt_token');
+
+    for(let i=0;i<class_arrayOptions.length;++i){
+
+        found = false;
+        
+        if((arr_registeredPool.length === 0) && (class_arrayOptions[i].value!='null')){
+            arr_registeredPool.push(class_arrayOptions[i].value);
+        }
+        else{
+            for(let k =0;k<arr_registeredPool.length;++k){
+                if((arr_registeredPool[k] === class_arrayOptions[i].value)){
+                    found = true;
+                    break;
+                }
+            }
+
+            if((found === false) && (class_arrayOptions[i].value!='null')){
+                arr_registeredPool.push(class_arrayOptions[i].value);
+            }
+        }
+    }
+
+    //send the newely registeredModules
+    console.log(arr_registeredPool);
+
+    if(arr_registeredPool.length === 0)
+    {
+        alert('Nothing to commit');
+        return;
+    }
+
+    const jsonObj = {
+        id:id,
+        arr_modules:arr_registeredPool
+    }
+
+    const jsonString = JSON.stringify(jsonObj)
+
+
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("POST", "http://localhost:3000/registerModules");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            //console.log(xhr.status);
+            //console.log(xhr.responseText);
+
+            if (xhr.status === 200) {
+                const jsonResponse = JSON.parse(xhr.responseText);
+                
+                const data = jsonResponse.data;
+
+                alert('Successfully registered the modules');
+
+                closeRegistrationPopup();
+                
+                id_moduleSelectionArea.innerHTML ="";
+                getModulesStudentTakes();
+
+
+            }
+            else if(xhr.status === 401)
+            {
+                const jsonResponse = JSON.parse(xhr.responseText);
+
+                alert(jsonResponse);
+            }
+
+        }
+    };
+
+    xhr.send(jsonString);
+
+
+    
+}
+
+/**
+ * 
+ * @param {*} index Index of the arrayEnrolledLabel
+ */
+function printEnroll(index){
+
+    console.log(index);
+    const class_arrayEnrolledLabel = document.getElementsByClassName('arrayEnrolledLabel');
+
+    class_arrayEnrolledLabel[index].innerHTML = '';
+
+    setTimeout(function() {
+        class_arrayEnrolledLabel[index].innerHTML = 'enrolled';
+        class_arrayEnrolledLabel[index].style.color = 'green';
+    }, 1500);
 }
 
 function closeRegistrationPopup(){
@@ -384,28 +513,6 @@ function deregisterPopUp(){
     chlPopUp.appendChild(noButton);
 
     id_moduleSelectionArea.appendChild(chlPopUp);
-
-    // id_moduleSelectionArea.appendChild(
-    // `<div style = '
-    // position: absolute;
-    // top: -50px;
-    // left: 50%;
-    // transform: translateX(-50%);
-    // background: white;
-    // border: 1px solid #ccc;
-    // padding: 10px;
-    // box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    // z-index: 1000;
-    // width: 300px;
-    // height: 100px;
-    // align-items: center;
-    // justify-content: center;
-    // text-align: center; /* Center align text horizontally */
-    // id = 'deregistrationPopUp'
-    // '> 
-    //     <label style = 'color:red; margin-bottom:8px'>Save Changes?</label><br>
-    //     <button class="btn btn-primary" type="submit" onclick = "yesDeregistration()">Yes</button> <button class="btn btn-primary" type="submit" onclieck ="noDeregistration()">No</button>
-    // </div>`)
 }
 
 
@@ -524,10 +631,12 @@ function getCookie(cname) {
     return "";
 }
 
+
+
 /**
  * 
  * @returns An array of modules in the form of data:[{Obj1},{Obj2},{Obj3}]
- */
+*/
 function getStudentModulesCookieAsJsonObject() {
     const studentModulesCookie = getCookie('student_modules');
     if (studentModulesCookie) {
