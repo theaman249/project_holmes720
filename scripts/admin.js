@@ -1,7 +1,9 @@
-function getData(){
+function getAdminData(){
 
-    const token = getCookie('jwt_token');
-    const id = getCookie('id');
+    const token = getCookie('admin_jwt_token');
+    const id = getCookie('admin_id');
+
+    loading();
 
     const id_studentDetailsID = document.getElementById("studentDetails_id");
     const id_studentDetailsName = document.getElementById("studentDetails_name");
@@ -52,11 +54,6 @@ function getData(){
                 id_studentDetailsSurname.innerHTML = data[0].surname;
                 id_studentDetailsEmail.innerHTML = data[0].email
                 id_studentDetailsRole.innerHTML = data[0].role;
-
-                //save the user's current year of study
-                setCookie('year_of_study', data[0].year_of_study)
-
-                getModulesStudentTakes();
             }
             else if(xhr.status === 401)
             {

@@ -99,12 +99,12 @@ app.post('/register', (req, res) =>{
     })
 });
 
+
+
 app.post('/login', (req, res) =>{
 
     const {id, password} = req.body;
     var hash = "";
-
-    //console.log(req.body);
 
     const getHash = "SELECT * FROM students WHERE id ='"+id+"'";
     
@@ -551,10 +551,6 @@ app.post('/getUserData',authenticateToken,async (req,res)=>{
                 data: arr_return
             })
         }
-    })
-
-    
+    })    
 })
-
-
 

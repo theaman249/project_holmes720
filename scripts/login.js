@@ -43,8 +43,13 @@ function login(){
                 
                 
                 //set the JWT cookie
-                setCookie("jwt_token",jwtToken);
-                setCookie("id",id);
+                if(id[0] === 'u'){ //student tokens
+                    setCookie("jwt_token",jwtToken);
+                    setCookie("id",id);
+                }else{
+                    setCookie("admin_jwt_token",jwtToken);
+                    setCookie("admin_id",id);
+                }
 
                 if(jsonResponse.payload.role === 'student'){
                     window.location.replace("student_module_management.html");

@@ -37,7 +37,7 @@ function getData(){
 
     let xhr = new XMLHttpRequest();
     loading();
-    
+
     xhr.open("POST", "http://localhost:3000/getUserData");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
@@ -366,8 +366,6 @@ function commitModules(){
     const id = getCookie('id');
     const token = getCookie('jwt_token');
 
-    loading()
-
     for(let i=0;i<class_arrayOptions.length;++i){
 
         found = false;
@@ -422,8 +420,6 @@ function commitModules(){
                 const jsonResponse = JSON.parse(xhr.responseText);
                 
                 const data = jsonResponse.data;
-
-                unload();
 
                 alert('Successfully registered the modules');
 

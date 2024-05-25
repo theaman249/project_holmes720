@@ -53,4 +53,35 @@
     background-color: rgba(0, 0, 0, 0.5);  /* Adjust opacity here */
     z-index: 0;  /* Make sure it's behind the loader */
 }
+
+
+.content-center{
+    display:block;
+    width:50%;
+    margin:0 auto;
+}
+
+.button-styling-1 {
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.inline-block {
+    display: inline-block;
+    vertical-align: top; /* Adjust if needed */
+}
+
+.div-borders{
+    border-style: solid;
+    border-color: green;
+    padding: 8px;
+}
   
