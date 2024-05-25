@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
+const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
 
@@ -25,7 +25,8 @@ const ACTION_REGISTER = "register";
 const ACTION_LOGOUT ="logout";
 const ACTION_REGISTERED = "registered module(s)";
 const ACTION_DEREGISTER = "deregistered module(s)";
-const ACTION_REMOTE_LOG = "remote log written"
+const ACTION_REMOTE_LOG = "remote log written";
+const ACTION_READ_FILE = "open and read log file";
 
 const ACTION_FAILED_LOGIN = "login failed";
 const ACTION_FAILED_REGISTRATION = "regstration failed";
@@ -36,6 +37,7 @@ const ACTION_USER_EXISTS = "user already exists";
 const ACTION_QUERY_ERROR = "query failed to execute";
 const ACTION_INTERNAL_SERVER_ERROR = "internal server error";
 const ACTION_REJECETED_PROMISE = "rejected promise";
+const ACTION_FILE_READ = "error opening or reading a file";
 
 
 app.get('/', (req, res) => {
@@ -575,13 +577,67 @@ app.post('/getUserData',authenticateToken,async (req,res)=>{
     })    
 });
 
-app.post('/getLogData', authenticateToken, (req, res) =>{
-    const {result_count,id,} = req.body;
+app.post('/getLogData',authenticateToken, (req, res) =>{
+    const {result_count,stu_id,admin_id} = req.body;
 
-    if(id && id!=""){
+    const filePath = 'log.csv';
+
+    //console.log(req.body);
+
+    let arr_return = [];
+    let counter = 0;
+
+    // writeLog
+    // writeLog(admin_id,ACTION_READ_FILE);
+
+    fs.createReadStream(filePath)
+    .pipe(csv())
+    .on('data', (row) => {
+
+        if(counter < result_count){
+
+            if(stu_id && stu_id!= "") //looking for speific student
+            {
+                if(row.student_id === stu_id){
+                    const obj={
+                        id:row.student_id,
+                        action:row.action,
+                        timestamp:row.timestamp
+                    }
         
-    }
+                    arr_return.push(obj);
+                }
+            }
+            else
+            {
+                const obj={
+                    id:row.student_id,
+                    action:row.action,
+                    timestamp:row.timestamp
+                }
+    
+                arr_return.push(obj);
+            }
+            ++counter;
+        }
+    })
+    .on('end', () => {
+        //console.log('CSV file successfully processed');
+        //console.log(arr_return);
+
+        res.status(200).send({
+            message:"log data",
+            data: arr_return
+        })
+    })
+    .on('error', (err) => {
+        writeLog(admin_id,ACTION_FILE_READ);
+        console.error(`Error reading the file: ${err.message}`);
+    });
+    
 });
+
+
 
 app.post('/remoteWriteLog',authenticateToken, (req, res) =>{
 
@@ -601,13 +657,19 @@ app.post('/get')
 
 function writeLog(id,action){
 
-    const timestamp = new Date().getTime();
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
     const logFilePath = path.join(__dirname, 'log.csv');
 
     const logEntry = `${id},${action},${timestamp}\n`;
-
-    //console.log(logEntry);
 
     fs.appendFile(logFilePath, logEntry, (err) => {
         if (err) {

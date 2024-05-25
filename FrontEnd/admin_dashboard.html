@@ -47,51 +47,32 @@
             <span class="inline-block" style="margin-right: 80px;">
                 <label for="inNumResults_esg">Result count:</label>
                 <input type="number" id="inNumResults_esg" name="inNumResults_esg" max="150" placeholder="25" style="width: 50px;" value="25"><br><br>
-
-                <input type="checkbox" id="chbSortAlphabetically_esg" name="chbSortAlphabetically_esg">
-                <label for="vehicle1"> Sort Alphabetically</label><br><br>
     
-                <label for="inESGticker">ESG ticker:</label>
-                <input type="text" id="inESGticker" name="inESGticker" max="100" placeholder="SPY" style="width: 65px;" value="">                
+                <label for="inStudentNuber">student number:</label>
+                <input type="text" id="inStudentNuber" name="inStudentNuber" max="100" placeholder="u18105883" style="width: 100px;" value="">                
             </span>
 
             <span class="inline-block" style="margin-right: 80px;">
-                <label>ESG ratings:</label><br>
-                <input type="radio" id="all_esg" name="esgRating" value="all">
-                <label for="all_esg">all</label><br>
-                <input type="radio" id="green" name="esgRating" value="green">
-                <label for="green">green</label><br>
-                <input type="radio" id="orange" name="esgRating" value="orange">
-                <label for="orange">orange</label><br>
-                <input type="radio" id="yellow" name="esgRating" value="yellow">
-                <label for="yellow">yellow</label>
-                <input type="radio" id="brown" name="esgRating" value="poor">
-                <label for="brown">brown</label>
+                
             </span>
 
             <span class="inline-block">
-                <label>Ratings agency</label><br>
-                <input type="checkbox" id="chbMSCI" name="chbMSCI">
-                <label for="chbMSCI">MSCI</label><br>
-
-                <input type="checkbox" id="chbDowJones" name="chbDowJones">
-                <label for="chbDowJones">Dow Jones</label><br>
-    
-                <input type="checkbox" id="chbSPG" name="chbSPG">
-                <label for="chbSPG"> S&P Global</label><br>
+                
             </span>
         </div>
 
-        <div>
-            <span class="inline-block">
-                <button class="button-styling-1" onclick="getESGData()" style="background-color: orange;">GET</button>
-            </span>
-        </div>
+        <span>
+            <button type="button" onclick="getLogData(event)" class="btn" style="background-color: orange;">GET</button>
+        </span>
 
         <div>
-            <label id="lblLoading_esg"></label><br>
-            <textarea id="textAreaOut_esg" rows="18" cols="100" readonly placeholder="Welcome!"></textarea>
+            <label id="lblLoading"></label><br>
+            <textarea id="textAreaOut" rows="18" cols="100" readonly placeholder="Welcome!"></textarea>
         </div>
+
+        <span style="margin-bottom: 16px;">
+            <button type="button" onclick="logout()" class="btn btn-danger">Log-out</button>
+        </span>
     </div>
 <script src="../scripts/admin.js"></script>
 </body>
