@@ -8,6 +8,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -18,6 +20,22 @@ app.use(cors());
 app.use(bodyParser.json()); //for json data
 app.use(bodyParser.urlencoded({ extended: false })); //for URL encoded data
 
+const ACTION_LOGIN = "login";
+const ACTION_REGISTER = "register";
+const ACTION_LOGOUT ="logout";
+const ACTION_REGISTERED = "registered module";
+const ACTION_DEREGISTER = "deregistered module";
+const ACTION_REMOTE_LOG = "remote log written"
+
+const ACTION_FAILED_LOGIN = "login failed";
+const ACTION_FAILED_REGISTRATION = "regstration failed";
+const ACTION_FAILED_MODULE_REGISTER = "module regsitration failed";
+const ACTION_FAILED_MODULE_DEREGISTER = "module deregistation failed ";
+const ACTION_USER_EXISTS = "user already exists";
+
+const ACTION_QUERY_ERROR = "query failed to execute";
+const ACTION_INTERNAL_SERVER_ERROR = "internal server error";
+const ACTION_REJECETED_PROMISE = "rejeceted promise";
 
 
 app.get('/', (req, res) => {
@@ -67,6 +85,10 @@ app.post('/register', (req, res) =>{
         } else{
 
             if(result.rows.length > 0){
+
+                //write to log
+                writeLog(id,ACTION_USER_EXISTS);
+
                 res.send({
                     message: "user already exists",
                 })
@@ -74,7 +96,11 @@ app.post('/register', (req, res) =>{
             else{
                 bcrypt.hash(password, saltRounds, function(err, hash) {
                 if(err){
+                    //write to log
+                    writeLog(id,ACTION_INTERNAL_SERVER_ERROR);
+
                     console.log('There was an error with bcrypt', err);
+
                 } else{
                     // Store hash in your password DB.
                     const query = "INSERT INTO students (id, fname, lname, email, password,year_of_study,role) VALUES ('" +
@@ -82,8 +108,16 @@ app.post('/register', (req, res) =>{
 
                     client.query(query,(err, result)=>{
                         if (err) {
+
+                            //write to log
+                            writeLog(id,ACTION_QUERY_ERROR);
+
                             console.error('Error executing query:', err);
                         } else {
+
+                            //write to log
+                            writeLog(id,ACTION_REGISTER);
+
                             console.log('Register executed successfully.');
                             console.log('Inserted rows:', result.rowCount);
 
@@ -110,6 +144,10 @@ app.post('/login', (req, res) =>{
     
     client.query(getHash, (err,results) =>{
         if(err){
+
+            //write to log
+            writeLog(id,ACTION_QUERY_ERROR);
+
             console.error('Error executing query:', err);
         } else{
             //console.log(result.rows[0].password);
@@ -130,6 +168,9 @@ app.post('/login', (req, res) =>{
 
                         const options = { expiresIn: '5h' };
                         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, options);
+
+                        //write to log
+                        writeLog(id,ACTION_LOGIN);
                         
                         res.status(200).send({
                             message: "login successful",
@@ -138,6 +179,10 @@ app.post('/login', (req, res) =>{
                         });
                     } 
                     else {
+
+                        //write to log
+                        writeLog(id,ACTION_FAILED_LOGIN);
+
                         res.status(401).send({
                             message: "login unsuccessful",
                         });
@@ -195,6 +240,8 @@ function authenticateToken(req, res, next) {
 }
 
 app.get('/test', async (req, res) => {
+
+    writeLog();
 
     res.status(200).send({
         message: 'KZN',
@@ -311,6 +358,9 @@ app.post('/registerModules', authenticateToken, async (req, res) =>{
             promises.push(new Promise((resolve, reject) => {
                 client.query(registerModulesQuery, (err, result) => {
                     if (err) {
+                        
+                        //write log
+                        writeLog(id,ACTION_REJECETED_PROMISE);
                         reject(err);
                     } else {
                         resolve(result);
@@ -322,13 +372,20 @@ app.post('/registerModules', authenticateToken, async (req, res) =>{
         // Wait for all promises to resolve
         Promise.all(promises)
             .then(() => {
+
+                //write to log
+                writeLog(id,ACTION_REGISTERED);
+
                 res.status(200).send({
                     id: id,
-                    message: "successfully deregistered student"
+                    message: "successfully registered student modules"
                 });
             })
             .catch((error) => {
-                console.error(error);
+                
+                //write to log
+                writeLog(id,ACTION_FAILED_MODULE_REGISTER);
+
                 res.status(500).send({
                     message: "unable to execute query"
                 });
@@ -337,12 +394,20 @@ app.post('/registerModules', authenticateToken, async (req, res) =>{
 
 
     } else {
+
+        //write to log
+        writeLog(id,ACTION_INTERNAL_SERVER_ERROR);
+
         res.status(404).send({
             message: "No modules found for the given student ID"
         });
     }
     } catch (err) {
         console.error(err);
+
+        //write to log
+        writeLog(id,ACTION_QUERY_ERROR);
+
         res.status(500).send({
             message: "query execution failed"
         });
@@ -368,6 +433,10 @@ app.post('/deregisterModules', authenticateToken, (req, res) => {
         promises.push(new Promise((resolve, reject) => {
             client.query(deregisterModulesQuery, (err, result) => {
                 if (err) {
+
+                    //write log
+                    writeLog(id,ACTION_REJECETED_PROMISE);
+
                     reject(err);
                 } else {
                     resolve(result);
@@ -379,6 +448,10 @@ app.post('/deregisterModules', authenticateToken, (req, res) => {
     // Wait for all promises to resolve
     Promise.all(promises)
         .then(() => {
+
+            //write to log
+            writeLog(id,ACTION_DEREGISTER);
+
             res.status(200).send({
                 id: id,
                 message: "successfully deregistered student"
@@ -386,6 +459,10 @@ app.post('/deregisterModules', authenticateToken, (req, res) => {
         })
         .catch((error) => {
             console.error(error);
+
+            //write to log
+            writeLog(id,ACTION_FAILED_MODULE_DEREGISTER);
+
             res.status(500).send({
                 message: "unable to execute query"
             });
@@ -553,4 +630,38 @@ app.post('/getUserData',authenticateToken,async (req,res)=>{
         }
     })    
 })
+
+app.post('/remoteWriteLog', (req, res) =>{
+
+    const {id,action} = req.body;
+
+    writeLog(id,action);
+
+    writeLog(id, ACTION_REMOTE_LOG);
+
+    res.status(200).send({
+        message: "log successfully written"
+    })
+})
+
+
+
+function writeLog(id,action){
+
+    const timestamp = new Date().getTime();
+
+    const logFilePath = path.join(__dirname, 'log.csv');
+
+    const logEntry = `${id},${action},${timestamp}\n`;
+
+    //console.log(logEntry);
+
+    fs.appendFile(logFilePath, logEntry, (err) => {
+        if (err) {
+            console.error('Error appending data to log.csv:', err);
+        } else {
+            console.log('Log data appended successfully.');
+        }
+    });
+}
 
