@@ -124,7 +124,8 @@ app.post('/login', (req, res) =>{
                         //generate access token
                         const payload ={
                             id: results.rows[0].id,
-                            emai: results.rows[0].email
+                            email: results.rows[0].email,
+                            role: results.rows[0].role
                         }
 
                         const options = { expiresIn: '5h' };
@@ -132,7 +133,8 @@ app.post('/login', (req, res) =>{
                         
                         res.status(200).send({
                             message: "login successful",
-                            jwt_token: token
+                            jwt_token: token,
+                            payload: payload
                         });
                     } 
                     else {

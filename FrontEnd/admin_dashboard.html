@@ -17,11 +17,11 @@
             THE CSP WORKS!!! It also works with my bootstrap content.
             CSP also specifies the endPoints or URL that your domain is allowed to point to.
         -->
-        <title>Student Module Management</title>
+        <title>Administration Dashboard</title>
     </head>
 <body onload="getData()">
     <div class="content-center" style="margin-top: 32px;">
-        <h1 class="text-body-style-1" style="text-align: center;">Student Module management</h1>
+        <h1 class="text-body-style-1" style="text-align: center;">Administration Dashboard</h1>
 
         <div style="justify-content: center; display: flex; margin-top: 8px;" >
             <img src="/images/up_logo.png" width="300" height="100" >
@@ -32,36 +32,8 @@
             <label class="text-body-style-1">name:</label> <label id="studentDetails_name" class="student-details-formatting">John</label><br>
             <label class="text-body-style-1">surname:</label> <label id="studentDetails_surname" class="student-details-formatting">Doe</label><br>
             <label class="text-body-style-1">email:</label> <label id="studentDetails_email" class="student-details-formatting">john@mail.com</label><br>
-            <label class="text-body-style-1">year of study:</label> <label id="studentDetails_YOS" class="student-details-formatting">2</label><br>
             <label class="text-body-style-1">role:</label> <label id="studentDetails_role" class="student-details-formatting">student</label>
         </div>
-
-        <div id="loader-background">
-            <div id="loader">
-            
-            </div>
-        </div>
-        
-       <div id = "moduleSectionArea" style="margin-bottom: 32px; position: relative;">
-
-       </div>
-
-        <span>
-            <button type="button" onclick="commitRegistration()" class="btn btn-success">Register</button>
-        </span>
-
-        <span>
-            <button type="button" onclick="commitDeregistration()" class="btn btn-success">De-register</button>
-        </span><br><br>
-
-        <span>
-            <button type="button" onclick="logout()" class="btn btn-danger">Log-out</button>
-        </span>
-
-        
-    
     </div>
+<script src="../scripts/admin.js"></script>
 </body>
-<script src="../scripts/student_module.js"></script>
-</html>
-

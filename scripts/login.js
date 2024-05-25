@@ -31,17 +31,30 @@ function login(){
             console.log(xhr.responseText);
 
             if (xhr.status === 200) {
-                alert('Welcome!');
                 successOut.innerHTML = "";
 
                 const jsonResponse = JSON.parse(xhr.responseText);
 
                 const jwtToken = jsonResponse.jwt_token;
+
+                console.log(jsonResponse.payload.role);
+                
+                alert('Welcome!');
+                
                 
                 //set the JWT cookie
                 setCookie("jwt_token",jwtToken);
                 setCookie("id",id);
-                window.location.replace("student_module_management.html");
+
+                if(jsonResponse.payload.role === 'student'){
+                    window.location.replace("student_module_management.html");
+                }
+                else{
+                    window.location.replace("admin_dashboard.html");
+                }
+                
+
+                
             } 
             else if(xhr.status === 401){
                 alert('Incorrect username or password provided');

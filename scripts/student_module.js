@@ -2,25 +2,7 @@ var myVar;
 const id_moduleSelectionArea = document.getElementById("moduleSectionArea");
 let arrDeregisteredPool = [];
 
-function loading(){
-    console.log("loading....");
-    const idLoader = document.getElementById("loader");
-    const idBackgroundLoader = document.getElementById("loader-background");
 
-    idLoader.style.display ="block";
-    idBackgroundLoader.style.display ="block";
-
-}
-
-function unload(){
-    console.log("unloading....");
-    const idLoader = document.getElementById("loader");
-    const idBackgroundLoader = document.getElementById("loader-background");
-
-    idLoader.style.display ="none";
-    idBackgroundLoader.style.display ="none";
-
-}
 
 //name of jwt toke = jwt_token
 function getData(){
@@ -54,7 +36,8 @@ function getData(){
 
 
     let xhr = new XMLHttpRequest();
-
+    loading();
+    
     xhr.open("POST", "http://localhost:3000/getUserData");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
@@ -241,6 +224,23 @@ function getModulesForAYear(){
 
 }
 
+function logout(){
+
+    //delete all cookies related to the student
+    deleteCookie('jwt_token');
+    deleteCookie('role');
+    deleteCookie('id');
+    deleteCookie('student_modules');
+
+    //go back to the login page
+    window.location.replace("login.html");
+}
+
+function deleteCookie(cookieName) {
+    // Set the cookie's expiration date to a past date
+    document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
 function commitDeregistration(){
 
     //deregisterPopUp();
@@ -252,8 +252,6 @@ function commitDeregistration(){
     else{
         deregisterPopUp();
     }
-
-    
 }
 
 function commitRegistration(){
@@ -368,6 +366,8 @@ function commitModules(){
     const id = getCookie('id');
     const token = getCookie('jwt_token');
 
+    loading()
+
     for(let i=0;i<class_arrayOptions.length;++i){
 
         found = false;
@@ -422,6 +422,8 @@ function commitModules(){
                 const jsonResponse = JSON.parse(xhr.responseText);
                 
                 const data = jsonResponse.data;
+
+                unload();
 
                 alert('Successfully registered the modules');
 
@@ -515,7 +517,6 @@ function deregisterPopUp(){
     id_moduleSelectionArea.appendChild(chlPopUp);
 }
 
-
 function yesDeregistration(){
 
     id_moduleSelectionArea.removeChild(document.getElementById('deregistrationPopUp'));
@@ -523,6 +524,8 @@ function yesDeregistration(){
     const id = getCookie('id');
     const token = getCookie('jwt_token');
     //alert(id + 'wants to deregister from: '+arrDeregisteredPool);
+
+    loading();
 
     //pop-up dissappears
 
@@ -548,6 +551,10 @@ function yesDeregistration(){
                 const jsonResponse = JSON.parse(xhr.responseText);
                 
                 const data = jsonResponse.data;
+
+                unload();
+
+                alert('successfully deregistered the module(s)');
 
                 console.log(data);
                 id_moduleSelectionArea.innerHTML ="";
@@ -659,4 +666,24 @@ function removeModuleFromDeregisteredPool(module_id){
     if (index !== -1) {
         arrDeregisteredPool.splice(index, 1);
     }
+}
+
+function loading(){
+    console.log("loading....");
+    const idLoader = document.getElementById("loader");
+    const idBackgroundLoader = document.getElementById("loader-background");
+
+    idLoader.style.display ="block";
+    idBackgroundLoader.style.display ="block";
+
+}
+
+function unload(){
+    console.log("unloading....");
+    const idLoader = document.getElementById("loader");
+    const idBackgroundLoader = document.getElementById("loader-background");
+
+    idLoader.style.display ="none";
+    idBackgroundLoader.style.display ="none";
+
 }
