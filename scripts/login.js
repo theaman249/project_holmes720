@@ -38,28 +38,22 @@ function login(){
                 const jwtToken = jsonResponse.jwt_token;
 
                 console.log(jsonResponse.payload.role);
+
+                window.location.replace("student_module_management.html");
                 
-                alert('Welcome!');
-                
-                
-                //set the JWT cookie
-                if(id[0] === 'u'){ //student tokens
+                if(jsonResponse.payload.role === "student"){
                     setCookie("jwt_token",jwtToken);
                     setCookie("id",id);
-                }else{
+                    window.location.replace("student_module_management.html");
+                    console.log('student loggin');
+                }
+                else
+                {
                     setCookie("admin_jwt_token",jwtToken);
                     setCookie("admin_id",id);
-                }
-
-                if(jsonResponse.payload.role === 'student'){
-                    window.location.replace("student_module_management.html");
-                }
-                else{
                     window.location.replace("admin_dashboard.html");
+                    console.log('admin loggin');
                 }
-                
-
-                
             } 
             else if(xhr.status === 401){
                 alert('Incorrect username or password provided');

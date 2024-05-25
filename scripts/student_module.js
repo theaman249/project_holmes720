@@ -175,7 +175,7 @@ function getModulesStudentTakes(){
 
 function getModulesForAYear(){
 
-    console.log('getting modules...');
+    //console.log('getting modules...');
     const year_of_study = getCookie('year_of_study');
     const token = getCookie('jwt_token');
 
@@ -225,6 +225,48 @@ function getModulesForAYear(){
 }
 
 function logout(){
+
+    const token = getCookie('jwt_token');
+    const id = getCookie('id');
+
+    const jsonObj = {
+        id:id,
+        action:"logout"
+    }
+
+    const jsonString = JSON.stringify(jsonObj)
+
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("POST", "http://localhost:3000/remoteWriteLog");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            //console.log(xhr.status);
+            //console.log(xhr.responseText);
+
+            if (xhr.status === 200) {
+                const jsonResponse = JSON.parse(xhr.responseText);
+                
+                const data = jsonResponse.data;
+
+                console.log(data[0]);
+
+            }
+            else if(xhr.status === 401)
+            {
+                const jsonResponse = JSON.parse(xhr.responseText);
+
+                alert(jsonResponse);
+            }
+
+        }
+    };
+
+    xhr.send(jsonString);
 
     //delete all cookies related to the student
     deleteCookie('jwt_token');
