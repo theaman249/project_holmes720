@@ -70,15 +70,55 @@ function getAdminData(){
 
 
 
+function logout(){
 
+    const token = getCookie('admin_jwt_token');
+    const id = getCookie('admin_id');
 
+    const jsonObj = {
+        id:id,
+        action:"logout"
+    }
 
+    const jsonString = JSON.stringify(jsonObj)
 
+    let xhr = new XMLHttpRequest();
 
+    xhr.open("POST", "http://localhost:3000/remoteWriteLog");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            //console.log(xhr.status);
+            //console.log(xhr.responseText);
 
+            if (xhr.status === 200) {
+                const jsonResponse = JSON.parse(xhr.responseText);
+                
+                const data = jsonResponse.data;
 
+                //delete all cookies related to the student
+                deleteCookie('admin_jwt_token');
+                deleteCookie('admin_id');
 
+                //go back to the login page
+                window.location.replace("login.html");
+
+            }
+            else if(xhr.status === 401)
+            {
+                const jsonResponse = JSON.parse(xhr.responseText);
+
+                alert(jsonResponse);
+            }
+
+        }
+    };
+
+    xhr.send(jsonString);
+}
 
 
 function unload(){
@@ -126,4 +166,9 @@ function getCookie(cname) {
       }
     }
     return "";
+}
+
+function deleteCookie(cookieName) {
+    // Set the cookie's expiration date to a past date
+    document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }

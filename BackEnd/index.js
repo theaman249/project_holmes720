@@ -23,8 +23,8 @@ app.use(bodyParser.urlencoded({ extended: false })); //for URL encoded data
 const ACTION_LOGIN = "login";
 const ACTION_REGISTER = "register";
 const ACTION_LOGOUT ="logout";
-const ACTION_REGISTERED = "registered module";
-const ACTION_DEREGISTER = "deregistered module";
+const ACTION_REGISTERED = "registered module(s)";
+const ACTION_DEREGISTER = "deregistered module(s)";
 const ACTION_REMOTE_LOG = "remote log written"
 
 const ACTION_FAILED_LOGIN = "login failed";
@@ -35,7 +35,7 @@ const ACTION_USER_EXISTS = "user already exists";
 
 const ACTION_QUERY_ERROR = "query failed to execute";
 const ACTION_INTERNAL_SERVER_ERROR = "internal server error";
-const ACTION_REJECETED_PROMISE = "rejeceted promise";
+const ACTION_REJECETED_PROMISE = "rejected promise";
 
 
 app.get('/', (req, res) => {
@@ -297,125 +297,69 @@ app.post('/getModulesForAYear', authenticateToken ,(req, res) =>{
 });
 
 app.post('/registerModules', authenticateToken, async (req, res) =>{
-    const {id, arr_modules} = req.body;
+    const { id, arr_modules } = req.body;
     const user = req.user; // Get user data from the request object
-    const promises = [];
-
-    let arr_clearedModulesForRegistration = [];
-
-    //console.log(req.body);
 
     try {
         const { rows } = await client.query(`
-        SELECT 
-            m.name AS module_name, 
-            m.id AS module_id,
-            m.year_of_study,
-            m.semester
-        FROM 
-            students_modules sm
-        INNER JOIN 
-            modules m ON sm.module_id = m.id
-        WHERE 
-            sm.student_id = $1;
-    `, [id])
-    
-    if (rows.length > 0) {
-        const data = rows.map(row => ({
-            id: row.module_id,
-            name: row.module_name,
-            semester: row.semester,
-            year_of_study: row.year_of_study,
-        }));
+            SELECT 
+                m.name AS module_name, 
+                m.id AS module_id,
+                m.year_of_study,
+                m.semester
+            FROM 
+                students_modules sm
+            INNER JOIN 
+                modules m ON sm.module_id = m.id
+            WHERE 
+                sm.student_id = $1;
+        `, [id]);
 
-        console.log(data);
+        if (rows.length > 0) {
+            const registeredModules = rows.map(row => row.module_id);
+            const arr_clearedModulesForRegistration = arr_modules.filter(module => !registeredModules.includes(module));
 
-        for(let i =0;i<data.length;++i){
-
-            let found = false;
-
-            for(let k=0;k<arr_modules.length;++k)
-            {
-                if(arr_modules[k] === data[i].id){ //user is already registered for the module
-                    found = true;
-                    break;
-                }
-                
-                if(found === false){
-                    arr_clearedModulesForRegistration.push(arr_modules[k]);
-                }
-            }
-        }
-
-        //console.log(arr_clearedModulesForRegistration);
-
-        //link the module to the student.
-
-        for (let i = 0; i < arr_clearedModulesForRegistration.length; ++i) {
-            //console.log(i);
-            const registerModulesQuery = `INSERT INTO students_modules(student_id,module_id) VALUES('${id}','${arr_clearedModulesForRegistration[i]}')`;
-            // Push each query promise to the array
-            promises.push(new Promise((resolve, reject) => {
-                client.query(registerModulesQuery, (err, result) => {
-                    if (err) {
-                        
-                        //write log
-                        writeLog(id,ACTION_REJECETED_PROMISE);
-                        reject(err);
-                    } else {
-                        resolve(result);
-                    }
-                });
-            }));
-        }
-    
-        // Wait for all promises to resolve
-        Promise.all(promises)
-            .then(() => {
-
-                //write to log
-                writeLog(id,ACTION_REGISTERED);
-
-                res.status(200).send({
-                    id: id,
-                    message: "successfully registered student modules"
-                });
-            })
-            .catch((error) => {
-                
-                //write to log
-                writeLog(id,ACTION_FAILED_MODULE_REGISTER);
-
-                res.status(500).send({
-                    message: "unable to execute query"
-                });
+            const promises = arr_clearedModulesForRegistration.map(module => {
+                const registerModulesQuery = 'INSERT INTO students_modules (student_id, module_id) VALUES ($1, $2)';
+                return client.query(registerModulesQuery, [id, module])
+                    .then(result => {
+                        // Write log for successful registration
+                        writeLog(id, ACTION_REGISTERED);
+                        return result;
+                    })
+                    .catch(err => {
+                        // Write log for rejected promise
+                        writeLog(id, ACTION_REJECTED_PROMISE);
+                        throw err;
+                    });
             });
 
+            await Promise.all(promises);
 
+            res.status(200).send({
+                id: id,
+                message: "Successfully registered student modules"
+            });
+        } else {
+            // Write log for internal server error
+            writeLog(id, ACTION_INTERNAL_SERVER_ERROR);
 
-    } else {
-
-        //write to log
-        writeLog(id,ACTION_INTERNAL_SERVER_ERROR);
-
-        res.status(404).send({
-            message: "No modules found for the given student ID"
-        });
-    }
+            res.status(404).send({
+                message: "No modules found for the given student ID"
+            });
+        }
     } catch (err) {
         console.error(err);
 
-        //write to log
-        writeLog(id,ACTION_QUERY_ERROR);
+        // Write log for query error
+        writeLog(id, ACTION_QUERY_ERROR);
 
         res.status(500).send({
-            message: "query execution failed"
+            message: "Query execution failed"
         });
     }
-
-    
-    
 });
+
 
 app.post('/deregisterModules', authenticateToken, (req, res) => {
     const { id, arr_modules } = req.body;

@@ -12,6 +12,15 @@ function login(){
     successOut.innerHTML = "logging in....";
     const id = document.getElementById("id_logStudentNumberInput").value;
 
+    if(loginPassword.value.length === 0){
+        alert('Please enter a valid password');
+        return;
+    }
+    else if(loginStudentNumber.value === 0){
+        alert('Please eneter a valid student number');
+        return;
+    }
+
     const jsonObj={
         id: loginStudentNumber.value,
         password: loginPassword.value,
@@ -45,14 +54,12 @@ function login(){
                     setCookie("jwt_token",jwtToken);
                     setCookie("id",id);
                     window.location.replace("student_module_management.html");
-                    console.log('student loggin');
                 }
                 else
                 {
                     setCookie("admin_jwt_token",jwtToken);
                     setCookie("admin_id",id);
-                    window.location.replace("admin_dashboard.html");
-                    console.log('admin loggin');
+                    window.location.replace("admin_dashboard.html"); 
                 }
             } 
             else if(xhr.status === 401){

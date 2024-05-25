@@ -253,7 +253,14 @@ function logout(){
                 
                 const data = jsonResponse.data;
 
-                console.log(data[0]);
+                //delete all cookies related to the student
+                deleteCookie('jwt_token');
+                deleteCookie('role');
+                deleteCookie('id');
+                deleteCookie('student_modules');
+
+                //go back to the login page
+                window.location.replace("login.html");
 
             }
             else if(xhr.status === 401)
@@ -267,15 +274,6 @@ function logout(){
     };
 
     xhr.send(jsonString);
-
-    //delete all cookies related to the student
-    deleteCookie('jwt_token');
-    deleteCookie('role');
-    deleteCookie('id');
-    deleteCookie('student_modules');
-
-    //go back to the login page
-    window.location.replace("login.html");
 }
 
 function deleteCookie(cookieName) {
@@ -466,7 +464,6 @@ function commitModules(){
                 alert('Successfully registered the modules');
 
                 closeRegistrationPopup();
-                
                 id_moduleSelectionArea.innerHTML ="";
                 getModulesStudentTakes();
 
