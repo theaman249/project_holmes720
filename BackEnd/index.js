@@ -573,9 +573,17 @@ app.post('/getUserData',authenticateToken,async (req,res)=>{
             })
         }
     })    
-})
+});
 
-app.post('/remoteWriteLog', (req, res) =>{
+app.post('/getLogData', authenticateToken, (req, res) =>{
+    const {result_count,id,} = req.body;
+
+    if(id && id!=""){
+        
+    }
+});
+
+app.post('/remoteWriteLog',authenticateToken, (req, res) =>{
 
     const {id,action} = req.body;
 
@@ -586,8 +594,9 @@ app.post('/remoteWriteLog', (req, res) =>{
     res.status(200).send({
         message: "log successfully written"
     })
-})
+});
 
+app.post('/get')
 
 
 function writeLog(id,action){
