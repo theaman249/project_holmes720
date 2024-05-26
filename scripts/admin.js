@@ -148,7 +148,7 @@ function test(){
 function getLogData(){
 
     const id = getCookie('admin_id');
-    const token = getCookie('jwt_token');
+    const token = getCookie('admin_jwt_token');
 
     const student_id = document.getElementById("inStudentNuber").value;
     const resultCount = Number(document.getElementById("inNumResults_esg").value);

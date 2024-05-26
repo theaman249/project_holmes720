@@ -1,11 +1,16 @@
 const { Pool } = require('pg');
+const dotenv = require('dotenv');
+dotenv.config({path: '.env'})
 
 const pool = new Pool({
   user: 'postgres',
-  host: 'localhost',
-  password: 'admin',
+  host: 'cos720-db.c1mqccm6mych.us-east-1.rds.amazonaws.com',
+  password: process.env.AWS_RDS_PASSWORD,
   port: 5432,
-  database: 'cos720_db',
+  database: 'initial_cos720_db',
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 module.exports = {
