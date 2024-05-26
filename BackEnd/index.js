@@ -39,6 +39,9 @@ const ACTION_INTERNAL_SERVER_ERROR = "internal server error";
 const ACTION_REJECETED_PROMISE = "rejected promise";
 const ACTION_FILE_READ = "error opening or reading a file";
 
+//firebase stuff
+const functions = require('firebase-functions');
+
 
 app.get('/', (req, res) => {
 
@@ -680,3 +683,5 @@ function writeLog(id,action){
     });
 }
 
+//whenever there's a request on this URL run functions against this app
+exports.api = functions.https.onRequest(app); 

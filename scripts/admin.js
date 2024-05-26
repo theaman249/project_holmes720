@@ -31,7 +31,7 @@ function getAdminData(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/getUserData");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/getUserData");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -101,7 +101,7 @@ function getAdminData(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/getUserData");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/getUserData");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -171,7 +171,7 @@ function getLogData(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/getLogData");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/getLogData");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -223,7 +223,7 @@ function logout(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/remoteWriteLog");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/remoteWriteLog");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);

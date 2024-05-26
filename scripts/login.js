@@ -29,7 +29,7 @@ function login(){
     const jsonString = JSON.stringify(jsonObj);
 
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:3000/login");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/login");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
             

@@ -38,7 +38,7 @@ function getData(){
     let xhr = new XMLHttpRequest();
     loading();
 
-    xhr.open("POST", "http://localhost:3000/getUserData");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/getUserData");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -108,7 +108,7 @@ function getModulesStudentTakes(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/getModulesUserTakes");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/getModulesUserTakes");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -193,7 +193,7 @@ function getModulesForAYear(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/getModulesForAYear");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/getModulesForAYear");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -238,7 +238,7 @@ function logout(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/remoteWriteLog");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/remoteWriteLog");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -446,7 +446,7 @@ function commitModules(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/registerModules");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/registerModules");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -574,7 +574,7 @@ function yesDeregistration(){
 
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "http://localhost:3000/deregisterModules");
+    xhr.open("POST", "https://us-central1-cos720-backend.cloudfunctions.net/api/deregisterModules");
     xhr.setRequestHeader("Accept", "application/json");
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
