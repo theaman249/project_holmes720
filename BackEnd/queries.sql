@@ -1,1 +1,0 @@
-INSERT INTO students VALUES ('a87654321', 'Zachariah','Trench', 'trench@FBC','control','0','admin')
